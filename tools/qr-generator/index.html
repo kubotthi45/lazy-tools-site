@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QRコード生成 - 無料・登録不要 | Lazy Tools</title>
+  <meta name="description" content="テキストやURLからQRコードを無料で即座に作成。サイズ・色のカスタマイズ対応。PNG/SVGでダウンロード。登録不要・完全ブラウザ処理。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://lazy-tools.pages.dev/tools/qr-generator/">
+  <link rel="stylesheet" href="/css/common.css">
+
+  <!-- OGP -->
+  <meta property="og:title" content="QRコード生成 - 無料・登録不要 | Lazy Tools">
+  <meta property="og:description" content="テキストやURLからQRコードを無料で即座に作成。PNG/SVGでダウンロード可能。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lazy-tools.pages.dev/tools/qr-generator/">
+
+  <!-- QRコードライブラリ（CDN） -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
+
+  <style>
+    .qr-output {
+      text-align: center;
+      margin: 24px 0;
+      min-height: 60px;
+    }
+
+    .qr-output canvas,
+    .qr-output img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+
+    .options-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .options-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .color-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .color-input-wrap input[type="color"] {
+      width: 40px;
+      height: 36px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .color-input-wrap span {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    .char-count {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .how-to {
+      margin-top: 40px;
+    }
+
+    .how-to h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+    }
+
+    .how-to h3 {
+      font-size: 1rem;
+      margin: 20px 0 8px;
+    }
+
+    .how-to p,
+    .how-to li {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .how-to ol {
+      padding-left: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Lazy Tools</a>
+      <p class="tagline">無料で使えるオンラインツール集</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">QRコード生成</h1>
+      <p class="tool-description">テキストやURLを入力するだけで、QRコードを即座に作成できます。完全無料・登録不要。</p>
+
+      <div class="tool-panel">
+        <!-- 入力 -->
+        <div class="form-group">
+          <label for="qr-input">テキストまたはURL</label>
+          <textarea id="qr-input" placeholder="https://example.com または任意のテキスト" rows="3" maxlength="2048"></textarea>
+          <div class="char-count"><span id="char-count">0</span> / 2,048 文字</div>
+        </div>
+
+        <!-- オプション -->
+        <div class="options-row">
+          <div class="form-group">
+            <label for="qr-size">サイズ</label>
+            <select id="qr-size">
+              <option value="200">200 x 200</option>
+              <option value="300" selected>300 x 300</option>
+              <option value="400">400 x 400</option>
+              <option value="600">600 x 600</option>
+              <option value="800">800 x 800</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="qr-ecl">誤り訂正レベル</label>
+            <select id="qr-ecl">
+              <option value="L">L（7%）- 軽量</option>
+              <option value="M" selected>M（15%）- 標準</option>
+              <option value="Q">Q（25%）- 高</option>
+              <option value="H">H（30%）- 最高</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="options-row">
+          <div class="form-group">
+            <label>前景色</label>
+            <div class="color-input-wrap">
+              <input type="color" id="qr-fg" value="#000000">
+              <span id="fg-label">#000000</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>背景色</label>
+            <div class="color-input-wrap">
+              <input type="color" id="qr-bg" value="#ffffff">
+              <span id="bg-label">#ffffff</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 生成ボタン -->
+        <button id="generate-btn" class="btn btn-primary" style="width:100%;margin-top:8px;">QRコードを生成</button>
+
+        <!-- 出力 -->
+        <div class="qr-output" id="qr-output"></div>
+
+        <!-- ダウンロード -->
+        <div class="btn-group" id="download-btns" style="display:none;justify-content:center;">
+          <button id="dl-png" class="btn btn-secondary">PNG でダウンロード</button>
+          <button id="dl-svg" class="btn btn-secondary">SVG でダウンロード</button>
+        </div>
+      </div>
+
+      <!-- 広告スロット -->
+      <div class="ad-slot">
+        広告スペース（AdSense審査通過後に設置）
+      </div>
+
+      <!-- SEO用コンテンツ -->
+      <section class="how-to">
+        <h2>QRコード生成ツールの使い方</h2>
+
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>テキスト欄にURLやテキストを入力します</li>
+          <li>必要に応じてサイズ・色を調整します</li>
+          <li>「QRコードを生成」ボタンを押します</li>
+          <li>PNGまたはSVG形式でダウンロードします</li>
+        </ol>
+
+        <h3>プライバシーについて</h3>
+        <p>入力されたデータはすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。安心してご利用ください。</p>
+
+        <h3>QRコードとは？</h3>
+        <p>QRコード（Quick Response Code）は、二次元バーコードの一種です。スマートフォンのカメラで読み取ることで、WebサイトのURL、テキスト、連絡先情報などを素早く取得できます。名刺、チラシ、ポスター、商品パッケージなど、さまざまな場面で活用されています。</p>
+
+        <h3>誤り訂正レベルとは？</h3>
+        <p>QRコードは一部が汚れたり欠けても読み取れるよう、誤り訂正機能を備えています。レベルが高いほど復元能力が上がりますが、QRコードのパターンが密になります。通常はM（15%）で十分です。ロゴを重ねる場合はH（30%）がおすすめです。</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Lazy Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const input = document.getElementById('qr-input');
+    const charCount = document.getElementById('char-count');
+    const sizeSelect = document.getElementById('qr-size');
+    const eclSelect = document.getElementById('qr-ecl');
+    const fgInput = document.getElementById('qr-fg');
+    const bgInput = document.getElementById('qr-bg');
+    const fgLabel = document.getElementById('fg-label');
+    const bgLabel = document.getElementById('bg-label');
+    const generateBtn = document.getElementById('generate-btn');
+    const output = document.getElementById('qr-output');
+    const downloadBtns = document.getElementById('download-btns');
+    const dlPng = document.getElementById('dl-png');
+    const dlSvg = document.getElementById('dl-svg');
+
+    let currentCanvas = null;
+    let currentSvg = null;
+    let currentText = '';
+
+    // 文字数カウント
+    input.addEventListener('input', () => {
+      charCount.textContent = input.value.length;
+    });
+
+    // 色ラベル更新
+    fgInput.addEventListener('input', () => { fgLabel.textContent = fgInput.value; });
+    bgInput.addEventListener('input', () => { bgLabel.textContent = bgInput.value; });
+
+    // 生成
+    generateBtn.addEventListener('click', generate);
+
+    // Ctrl+Enterでも生成
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        generate();
+      }
+    });
+
+    function generate() {
+      const text = input.value.trim();
+      if (!text) {
+        output.innerHTML = '<p style="color:var(--color-text-muted)">テキストを入力してください</p>';
+        downloadBtns.style.display = 'none';
+        return;
+      }
+
+      currentText = text;
+      const size = parseInt(sizeSelect.value);
+      const ecl = eclSelect.value;
+      const fg = fgInput.value;
+      const bg = bgInput.value;
+
+      const opts = {
+        width: size,
+        margin: 2,
+        errorCorrectionLevel: ecl,
+        color: { dark: fg, light: bg }
+      };
+
+      // Canvas版を生成
+      output.innerHTML = '';
+      const canvas = document.createElement('canvas');
+      output.appendChild(canvas);
+
+      QRCode.toCanvas(canvas, text, opts, (err) => {
+        if (err) {
+          output.innerHTML = '<p style="color:#ef4444">生成に失敗しました。テキストが長すぎる可能性があります。</p>';
+          downloadBtns.style.display = 'none';
+          return;
+        }
+        currentCanvas = canvas;
+        downloadBtns.style.display = 'flex';
+      });
+
+      // SVG版も裏で生成
+      QRCode.toString(text, { ...opts, type: 'svg' }, (err, svg) => {
+        if (!err) currentSvg = svg;
+      });
+    }
+
+    // PNGダウンロード
+    dlPng.addEventListener('click', () => {
+      if (!currentCanvas) return;
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = currentCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // SVGダウンロード
+    dlSvg.addEventListener('click', () => {
+      if (!currentSvg) return;
+      const blob = new Blob([currentSvg], { type: 'image/svg+xml' });
+      const link = document.createElement('a');
+      link.download = 'qrcode.svg';
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+  </script>
+</body>
+</html>
