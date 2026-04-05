@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画像モザイク加工 - 無料・登録不要 | Sakuraku Tools</title>
+  <meta name="description" content="写真や画像の一部にモザイクをかけられる無料ツール。ドラッグで範囲選択するだけ。データはサーバーに送信されません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/image-mosaic/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="画像モザイク加工 - 無料・登録不要 | Sakuraku Tools">
+  <meta property="og:description" content="写真の一部にモザイクをかけられる無料ツール。ブラウザ完結でプライバシーも安心。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/image-mosaic/">
+
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    .upload-area p {
+      color: var(--color-text-muted);
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .canvas-container {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      cursor: crosshair;
+      margin: 16px 0;
+    }
+
+    .canvas-container canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .selection-box {
+      position: absolute;
+      border: 2px solid var(--color-primary);
+      background: rgba(37, 99, 235, 0.15);
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .controls label {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+
+    .controls input[type="range"] {
+      width: 160px;
+    }
+
+    .strength-value {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      min-width: 24px;
+    }
+
+    .hidden { display: none !important; }
+
+    .how-to {
+      margin-top: 40px;
+    }
+
+    .how-to h2 {
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+    }
+
+    .how-to h3 {
+      font-size: 1rem;
+      margin: 20px 0 8px;
+    }
+
+    .how-to p,
+    .how-to li {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .how-to ol {
+      padding-left: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと使える。ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">画像モザイク加工</h1>
+      <p class="tool-description">画像の隠したい部分をドラッグで選択するだけ。完全ブラウザ処理で、データはサーバーに送信されません。</p>
+
+      <div class="tool-panel">
+        <!-- アップロード -->
+        <div id="upload-area" class="upload-area">
+          <strong>画像をドラッグ&ドロップ または クリックして選択</strong>
+          <p>JPEG / PNG / WebP 対応</p>
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+        </div>
+
+        <!-- コントロール -->
+        <div id="controls" class="hidden">
+          <div class="controls">
+            <label>モザイクの強さ:</label>
+            <input type="range" id="mosaic-strength" min="5" max="40" value="15">
+            <span class="strength-value" id="strength-label">15</span>
+            <button id="undo-btn" class="btn btn-secondary">元に戻す</button>
+            <button id="reset-btn" class="btn btn-secondary">全てリセット</button>
+          </div>
+
+          <!-- キャンバス -->
+          <div class="canvas-container" id="canvas-container">
+            <canvas id="canvas"></canvas>
+            <div class="selection-box hidden" id="selection-box"></div>
+          </div>
+
+          <!-- ダウンロード -->
+          <div class="btn-group" style="margin-top:16px;">
+            <button id="dl-btn" class="btn btn-primary">モザイク画像をダウンロード</button>
+            <button id="new-btn" class="btn btn-secondary">別の画像を選択</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-slot">
+        広告スペース（AdSense審査通過後に設置）
+      </div>
+
+      <section class="how-to">
+        <h2>画像モザイク加工ツールの使い方</h2>
+
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>画像をアップロードします（ドラッグ&ドロップまたはクリック）</li>
+          <li>モザイクをかけたい部分をマウスでドラッグして選択します</li>
+          <li>必要に応じてモザイクの強さを調整します</li>
+          <li>複数箇所にモザイクをかけることもできます</li>
+          <li>「モザイク画像をダウンロード」でPNG形式で保存します</li>
+        </ol>
+
+        <h3>プライバシーについて</h3>
+        <p>アップロードされた画像はすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。顔写真や個人情報を含む画像も安心してご利用ください。</p>
+
+        <h3>こんな場面で使えます</h3>
+        <ol>
+          <li>SNSに写真を投稿する前に、顔や個人情報を隠したい</li>
+          <li>ブログやレビュー記事で、個人情報をぼかしたい</li>
+          <li>フリマアプリの出品写真で背景を隠したい</li>
+          <li>スクリーンショットの個人情報を隠したい</li>
+        </ol>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const controls = document.getElementById('controls');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const canvasContainer = document.getElementById('canvas-container');
+    const selectionBox = document.getElementById('selection-box');
+    const strengthSlider = document.getElementById('mosaic-strength');
+    const strengthLabel = document.getElementById('strength-label');
+    const undoBtn = document.getElementById('undo-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const dlBtn = document.getElementById('dl-btn');
+    const newBtn = document.getElementById('new-btn');
+
+    let originalImage = null;
+    let history = [];
+    let isSelecting = false;
+    let startX = 0, startY = 0;
+
+    // スライダー
+    strengthSlider.addEventListener('input', () => {
+      strengthLabel.textContent = strengthSlider.value;
+    });
+
+    // アップロード
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => loadImage(e.target.files[0]));
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
+    });
+
+    function loadImage(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          originalImage = img;
+
+          // キャンバスサイズ制限（大きすぎる画像対策）
+          const maxW = 1200;
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = h * maxW / w; w = maxW; }
+          canvas.width = w;
+          canvas.height = h;
+
+          ctx.drawImage(img, 0, 0, w, h);
+          history = [ctx.getImageData(0, 0, w, h)];
+
+          uploadArea.classList.add('hidden');
+          controls.classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 選択操作
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
+        rx: clientX - rect.left,
+        ry: clientY - rect.top
+      };
+    }
+
+    function onStart(e) {
+      e.preventDefault();
+      isSelecting = true;
+      const pos = getCanvasPos(e);
+      startX = pos.x;
+      startY = pos.y;
+      selectionBox.style.left = pos.rx + 'px';
+      selectionBox.style.top = pos.ry + 'px';
+      selectionBox.style.width = '0';
+      selectionBox.style.height = '0';
+      selectionBox.classList.remove('hidden');
+    }
+
+    function onMove(e) {
+      if (!isSelecting) return;
+      e.preventDefault();
+      const pos = getCanvasPos(e);
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const rx = Math.min(pos.rx, startX / scaleX);
+      const ry = Math.min(pos.ry, startY / scaleY);
+      const rw = Math.abs(pos.rx - startX / scaleX);
+      const rh = Math.abs(pos.ry - startY / scaleY);
+
+      selectionBox.style.left = rx + 'px';
+      selectionBox.style.top = ry + 'px';
+      selectionBox.style.width = rw + 'px';
+      selectionBox.style.height = rh + 'px';
+    }
+
+    function onEnd(e) {
+      if (!isSelecting) return;
+      isSelecting = false;
+      selectionBox.classList.add('hidden');
+
+      const pos = getCanvasPos(e.changedTouches ? e.changedTouches[0] : e);
+      const x = Math.min(startX, pos.x);
+      const y = Math.min(startY, pos.y);
+      const w = Math.abs(pos.x - startX);
+      const h = Math.abs(pos.y - startY);
+
+      if (w < 5 || h < 5) return; // 小さすぎる選択は無視
+
+      applyMosaic(x, y, w, h);
+    }
+
+    canvasContainer.addEventListener('mousedown', onStart);
+    canvasContainer.addEventListener('mousemove', onMove);
+    canvasContainer.addEventListener('mouseup', onEnd);
+    canvasContainer.addEventListener('touchstart', onStart, { passive: false });
+    canvasContainer.addEventListener('touchmove', onMove, { passive: false });
+    canvasContainer.addEventListener('touchend', onEnd);
+
+    function applyMosaic(x, y, w, h) {
+      const blockSize = parseInt(strengthSlider.value);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      const sx = Math.max(0, Math.floor(x));
+      const sy = Math.max(0, Math.floor(y));
+      const ex = Math.min(canvas.width, Math.floor(x + w));
+      const ey = Math.min(canvas.height, Math.floor(y + h));
+
+      for (let by = sy; by < ey; by += blockSize) {
+        for (let bx = sx; bx < ex; bx += blockSize) {
+          let r = 0, g = 0, b = 0, count = 0;
+          const bw = Math.min(blockSize, ex - bx);
+          const bh = Math.min(blockSize, ey - by);
+
+          for (let py = by; py < by + bh; py++) {
+            for (let px = bx; px < bx + bw; px++) {
+              const i = (py * canvas.width + px) * 4;
+              r += data[i];
+              g += data[i + 1];
+              b += data[i + 2];
+              count++;
+            }
+          }
+
+          r = Math.round(r / count);
+          g = Math.round(g / count);
+          b = Math.round(b / count);
+
+          for (let py = by; py < by + bh; py++) {
+            for (let px = bx; px < bx + bw; px++) {
+              const i = (py * canvas.width + px) * 4;
+              data[i] = r;
+              data[i + 1] = g;
+              data[i + 2] = b;
+            }
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    }
+
+    // 元に戻す
+    undoBtn.addEventListener('click', () => {
+      if (history.length > 1) {
+        history.pop();
+        ctx.putImageData(history[history.length - 1], 0, 0);
+      }
+    });
+
+    // 全てリセット
+    resetBtn.addEventListener('click', () => {
+      if (history.length > 0) {
+        ctx.putImageData(history[0], 0, 0);
+        history = [history[0]];
+      }
+    });
+
+    // ダウンロード
+    dlBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'mosaic.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // 別の画像
+    newBtn.addEventListener('click', () => {
+      controls.classList.add('hidden');
+      uploadArea.classList.remove('hidden');
+      fileInput.value = '';
+      history = [];
+    });
+  </script>
+</body>
+</html>
