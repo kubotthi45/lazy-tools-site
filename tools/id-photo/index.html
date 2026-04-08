@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>証明写真サイズ変更 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="スマホで撮った写真を証明写真サイズにリサイズ。パスポート・履歴書・マイナンバーに対応。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/id-photo/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="証明写真サイズ変更 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="スマホ写真を証明写真サイズにリサイズ。パスポート・履歴書・マイナンバー対応。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/id-photo/">
+
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+    .upload-area p { color: var(--color-text-muted); margin-top: 8px; font-size: 0.9rem; }
+
+    .editor-layout {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .editor-main {
+      flex: 1;
+      min-width: 300px;
+    }
+    .editor-side {
+      width: 240px;
+    }
+
+    /* Canvas editor - 画像を直接canvasに描画 */
+    .canvas-wrap {
+      background: #e5e7eb;
+      border-radius: var(--radius);
+      text-align: center;
+      padding: 8px;
+      margin-bottom: 12px;
+    }
+    .canvas-wrap canvas {
+      cursor: move;
+      border-radius: 4px;
+      max-width: 100%;
+    }
+    .canvas-hint {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-top: 6px;
+    }
+
+    .zoom-control { margin-bottom: 16px; }
+    .zoom-control input[type="range"] { width: 100%; }
+
+    .size-presets { margin-bottom: 16px; }
+    .size-presets button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+    .size-presets button:hover, .size-presets button.active {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+    .size-presets .size-label { font-weight: 600; }
+    .size-presets .size-desc { font-size: 0.8rem; color: var(--color-text-muted); }
+
+    .output-info {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .hidden { display: none !important; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol, .how-to ul { padding-left: 1.5em; }
+    .how-to table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+    .how-to th, .how-to td { border: 1px solid var(--color-border); padding: 8px; text-align: left; }
+    .how-to th { background: var(--color-bg); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">証明写真サイズ変更</h1>
+      <p class="tool-description">スマホで撮った写真を証明写真のサイズにリサイズ。パスポート・履歴書・マイナンバーカードなどに対応。</p>
+
+      <div class="tool-panel">
+        <div id="upload-area" class="upload-area">
+          <strong>写真をドラッグ&ドロップ または クリックして選択</strong>
+          <p>JPEG / PNG 対応</p>
+          <input type="file" id="file-input" accept="image/jpeg,image/png" style="display:none">
+        </div>
+
+        <div id="editor" class="hidden">
+          <div class="editor-layout">
+            <div class="editor-main">
+              <div class="zoom-control">
+                <label>拡大・縮小: <span id="zoom-label">100</span>%</label>
+                <input type="range" id="zoom" min="30" max="300" value="100">
+              </div>
+              <div class="canvas-wrap">
+                <canvas id="edit-canvas" width="450" height="500"></canvas>
+                <p class="canvas-hint">ドラッグで写真の位置を調整</p>
+              </div>
+            </div>
+            <div class="editor-side">
+              <label>サイズを選択:</label>
+              <div class="size-presets" id="size-presets">
+                <button data-w="30" data-h="40" class="active">
+                  <span class="size-label">3.0 × 4.0 cm</span><br>
+                  <span class="size-desc">履歴書・TOEIC</span>
+                </button>
+                <button data-w="35" data-h="45">
+                  <span class="size-label">3.5 × 4.5 cm</span><br>
+                  <span class="size-desc">パスポート・マイナンバー</span>
+                </button>
+                <button data-w="24" data-h="30">
+                  <span class="size-label">2.4 × 3.0 cm</span><br>
+                  <span class="size-desc">運転免許証</span>
+                </button>
+                <button data-w="40" data-h="50">
+                  <span class="size-label">4.0 × 5.0 cm</span><br>
+                  <span class="size-desc">ビザ申請</span>
+                </button>
+              </div>
+
+              <div style="border:1px solid var(--color-border);border-radius:var(--radius);padding:12px;text-align:center;margin-bottom:16px;background:#fafafa;">
+                <label>プレビュー:</label>
+                <canvas id="preview-canvas" style="max-width:100%;height:auto;border:1px solid #ddd;margin-top:8px;"></canvas>
+              </div>
+              <div class="output-info" id="output-info"></div>
+
+              <div class="btn-group" style="flex-direction:column;">
+                <button id="dl-btn" class="btn btn-primary" style="width:100%;">ダウンロード</button>
+                <button id="new-btn" class="btn btn-secondary" style="width:100%;">別の写真を選択</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>証明写真サイズ変更の使い方</h2>
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>スマホやカメラで撮った顔写真をアップロードします</li>
+          <li>右側のプリセットから用途に合ったサイズを選びます</li>
+          <li>ドラッグで顔の位置を調整、スライダーで拡大・縮小します</li>
+          <li>「ダウンロード」でPNG形式（高画質）で保存します</li>
+        </ol>
+        <h3>対応サイズ一覧</h3>
+        <table>
+          <tr><th>サイズ</th><th>用途</th></tr>
+          <tr><td>3.0 × 4.0 cm</td><td>履歴書、TOEIC、英検</td></tr>
+          <tr><td>3.5 × 4.5 cm</td><td>パスポート、マイナンバーカード</td></tr>
+          <tr><td>2.4 × 3.0 cm</td><td>運転免許証</td></tr>
+          <tr><td>4.0 × 5.0 cm</td><td>ビザ申請</td></tr>
+        </table>
+        <h3>プライバシーについて</h3>
+        <p>アップロードされた写真はすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const DPI = 300;
+    const CM_TO_PX = DPI / 2.54;
+
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const editorEl = document.getElementById('editor');
+    const editCanvas = document.getElementById('edit-canvas');
+    const ctx = editCanvas.getContext('2d');
+    const zoomSlider = document.getElementById('zoom');
+    const zoomLabel = document.getElementById('zoom-label');
+    const outputInfo = document.getElementById('output-info');
+    const previewCanvas = document.getElementById('preview-canvas');
+    const previewCtx = previewCanvas.getContext('2d');
+    const dlBtn = document.getElementById('dl-btn');
+    const newBtn = document.getElementById('new-btn');
+    const presetBtns = document.querySelectorAll('#size-presets button');
+
+    let img = null;
+    let cropWmm = 30, cropHmm = 40;
+    let imgX = 0, imgY = 0;
+    let zoomFactor = 1;
+    let isDragging = false;
+    let dragLastX, dragLastY;
+
+    // Upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => loadImage(e.target.files[0]));
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
+    });
+
+    function loadImage(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img = new Image();
+        img.onload = () => {
+          initEditor();
+          uploadArea.classList.add('hidden');
+          editorEl.classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function getCropRect() {
+      // 切り抜き枠のサイズ（キャンバス上の表示サイズ）
+      const aspect = cropWmm / cropHmm;
+      const margin = 30;
+      let frameH = editCanvas.height - margin * 2;
+      let frameW = frameH * aspect;
+      if (frameW > editCanvas.width - margin * 2) {
+        frameW = editCanvas.width - margin * 2;
+        frameH = frameW / aspect;
+      }
+      const frameX = (editCanvas.width - frameW) / 2;
+      const frameY = (editCanvas.height - frameH) / 2;
+      return { x: frameX, y: frameY, w: frameW, h: frameH };
+    }
+
+    function initEditor() {
+      const frame = getCropRect();
+      // 画像を枠に合うように初期配置
+      const scaleToFit = Math.max(frame.w / img.width, frame.h / img.height);
+      zoomFactor = scaleToFit;
+      zoomSlider.value = 100;
+      // 画像を枠の中心に配置
+      imgX = frame.x + (frame.w - img.width * zoomFactor) / 2;
+      imgY = frame.y + (frame.h - img.height * zoomFactor) / 2;
+      updateInfo();
+      draw();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+
+      // 背景を薄いグレーに
+      ctx.fillStyle = '#d1d5db';
+      ctx.fillRect(0, 0, editCanvas.width, editCanvas.height);
+
+      // 画像を描画
+      const drawW = img.width * zoomFactor;
+      const drawH = img.height * zoomFactor;
+      ctx.drawImage(img, imgX, imgY, drawW, drawH);
+
+      // 枠の外を暗くする
+      const frame = getCropRect();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      // 上
+      ctx.fillRect(0, 0, editCanvas.width, frame.y);
+      // 下
+      ctx.fillRect(0, frame.y + frame.h, editCanvas.width, editCanvas.height - frame.y - frame.h);
+      // 左
+      ctx.fillRect(0, frame.y, frame.x, frame.h);
+      // 右
+      ctx.fillRect(frame.x + frame.w, frame.y, editCanvas.width - frame.x - frame.w, frame.h);
+
+      // 枠線
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(frame.x, frame.y, frame.w, frame.h);
+
+      // 中心ガイドライン（十字）— 黒縁+白線で視認性確保
+      const cx = frame.x + frame.w / 2;
+      const cy = frame.y + frame.h / 2;
+      ctx.setLineDash([6, 4]);
+      // 黒縁（太め）
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, frame.y); ctx.lineTo(cx, frame.y + frame.h);
+      ctx.moveTo(frame.x, cy); ctx.lineTo(frame.x + frame.w, cy);
+      ctx.stroke();
+      // 白線（細め・上に重ねる）
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx, frame.y); ctx.lineTo(cx, frame.y + frame.h);
+      ctx.moveTo(frame.x, cy); ctx.lineTo(frame.x + frame.w, cy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // プレビュー更新
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const outW = Math.round(cropWmm * CM_TO_PX / 10);
+      const outH = Math.round(cropHmm * CM_TO_PX / 10);
+      // プレビューは小さく表示（幅160px程度に縮小）
+      const dispW = 160;
+      const dispH = Math.round(dispW * outH / outW);
+      previewCanvas.width = dispW;
+      previewCanvas.height = dispH;
+
+      const frame = getCropRect();
+      const srcX = (frame.x - imgX) / zoomFactor;
+      const srcY = (frame.y - imgY) / zoomFactor;
+      const srcW = frame.w / zoomFactor;
+      const srcH = frame.h / zoomFactor;
+
+      previewCtx.fillStyle = '#ffffff';
+      previewCtx.fillRect(0, 0, dispW, dispH);
+      previewCtx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, dispW, dispH);
+    }
+
+    function updateInfo() {
+      const outW = Math.round(cropWmm * CM_TO_PX / 10);
+      const outH = Math.round(cropHmm * CM_TO_PX / 10);
+      outputInfo.textContent = `出力: ${outW} × ${outH} px（${cropWmm/10} × ${cropHmm/10} cm, 高画質）`;
+    }
+
+    // Zoom
+    zoomSlider.addEventListener('input', () => {
+      const frame = getCropRect();
+      const centerX = frame.x + frame.w / 2;
+      const centerY = frame.y + frame.h / 2;
+
+      const oldZoom = zoomFactor;
+      const ratio = parseInt(zoomSlider.value) / 100;
+      const baseScale = Math.max(frame.w / img.width, frame.h / img.height);
+      zoomFactor = baseScale * ratio;
+      zoomLabel.textContent = zoomSlider.value;
+
+      // ズーム中心を枠の中心に
+      imgX = centerX - (centerX - imgX) * (zoomFactor / oldZoom);
+      imgY = centerY - (centerY - imgY) * (zoomFactor / oldZoom);
+      draw();
+    });
+
+    // Drag
+    function getCanvasPos(e) {
+      const rect = editCanvas.getBoundingClientRect();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: cx - rect.left, y: cy - rect.top };
+    }
+
+    editCanvas.addEventListener('mousedown', startDrag);
+    editCanvas.addEventListener('touchstart', startDrag, { passive: false });
+    window.addEventListener('mousemove', moveDrag);
+    window.addEventListener('touchmove', moveDrag, { passive: false });
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+
+    function startDrag(e) {
+      e.preventDefault();
+      isDragging = true;
+      const pos = getCanvasPos(e);
+      dragLastX = pos.x;
+      dragLastY = pos.y;
+    }
+    function moveDrag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const pos = getCanvasPos(e);
+      const scaleX = editCanvas.width / editCanvas.getBoundingClientRect().width;
+      const scaleY = editCanvas.height / editCanvas.getBoundingClientRect().height;
+      imgX += (pos.x - dragLastX) * scaleX;
+      imgY += (pos.y - dragLastY) * scaleY;
+      dragLastX = pos.x;
+      dragLastY = pos.y;
+      draw();
+    }
+    function endDrag() { isDragging = false; }
+
+    // Presets
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        presetBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        cropWmm = parseInt(btn.dataset.w);
+        cropHmm = parseInt(btn.dataset.h);
+        initEditor();
+      });
+    });
+
+    // Download - 高画質で出力
+    dlBtn.addEventListener('click', () => {
+      const outW = Math.round(cropWmm * CM_TO_PX / 10);
+      const outH = Math.round(cropHmm * CM_TO_PX / 10);
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = outW;
+      outCanvas.height = outH;
+      const outCtx = outCanvas.getContext('2d');
+
+      const frame = getCropRect();
+      // 枠内の画像部分を出力サイズにマッピング
+      const srcX = (frame.x - imgX) / zoomFactor;
+      const srcY = (frame.y - imgY) / zoomFactor;
+      const srcW = frame.w / zoomFactor;
+      const srcH = frame.h / zoomFactor;
+
+      outCtx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, outW, outH);
+
+      const link = document.createElement('a');
+      link.download = `id-photo-${cropWmm/10}x${cropHmm/10}cm.png`;
+      link.href = outCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // New
+    newBtn.addEventListener('click', () => {
+      editorEl.classList.add('hidden');
+      uploadArea.classList.remove('hidden');
+      fileInput.value = '';
+      img = null;
+    });
+  </script>
+</body>
+</html>

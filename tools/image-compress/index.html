@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画像圧縮 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="JPEG・PNG画像のファイルサイズを圧縮。目標サイズ（KB）を指定して軽量化できます。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/image-compress/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="画像圧縮 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="画像のファイルサイズを指定KB以下に圧縮。ブラウザ完結で安心。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/image-compress/">
+
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+    .upload-area p { color: var(--color-text-muted); margin-top: 8px; font-size: 0.9rem; }
+
+    .settings-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .settings-row .form-group { margin-bottom: 0; }
+
+    .result-card {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 16px;
+    }
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .result-preview {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      border-radius: 4px;
+      background: #fff;
+      border: 1px solid var(--color-border);
+    }
+    .result-info { flex: 1; min-width: 200px; }
+    .result-info p { margin: 4px 0; font-size: 0.9rem; }
+    .result-info .size-reduced { color: #16a34a; font-weight: 600; }
+    .result-info .original-size { color: var(--color-text-muted); }
+
+    .quality-slider { width: 100%; }
+    .quality-value { font-size: 0.85rem; color: var(--color-text-muted); }
+
+    .hidden { display: none !important; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">画像圧縮</h1>
+      <p class="tool-description">画像のファイルサイズを軽くします。「○KB以下にしたい」という指定もできます。</p>
+
+      <div class="tool-panel">
+        <div id="upload-area" class="upload-area">
+          <strong>画像をドラッグ&ドロップ または クリックして選択</strong>
+          <p>JPEG / PNG / WebP 対応</p>
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+        </div>
+
+        <div id="controls" class="hidden">
+          <div class="settings-row">
+            <div class="form-group">
+              <label for="mode-select">圧縮モード</label>
+              <select id="mode-select">
+                <option value="quality">品質を指定</option>
+                <option value="target">○KB以下に収める</option>
+              </select>
+            </div>
+            <div class="form-group" id="quality-group">
+              <label>品質: <span id="quality-label">80</span>%</label>
+              <input type="range" id="quality-slider" class="quality-slider" min="10" max="100" value="80">
+            </div>
+            <div class="form-group hidden" id="target-group">
+              <label for="target-size">何KB以下にする？</label>
+              <input type="number" id="target-size" value="200" min="10" max="10000" style="width:120px;">
+            </div>
+            <button id="compress-btn" class="btn btn-primary">圧縮する</button>
+          </div>
+
+          <div id="result" class="result-card hidden">
+            <div class="result-row">
+              <img id="result-preview" class="result-preview">
+              <div class="result-info">
+                <p class="original-size">元のサイズ: <span id="original-size"></span></p>
+                <p class="size-reduced">圧縮後: <span id="compressed-size"></span></p>
+                <p>削減率: <span id="reduction-rate"></span></p>
+                <p style="font-size:0.8rem;color:var(--color-text-muted);">形式: JPEG</p>
+              </div>
+              <div>
+                <button id="dl-btn" class="btn btn-primary">ダウンロード</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <button id="new-btn" class="btn btn-secondary">別の画像を選択</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>画像圧縮ツールの使い方</h2>
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>画像をアップロードします</li>
+          <li>「品質を指定」モードで品質スライダーを調整するか、「目標サイズを指定」モードで目標KBを入力します</li>
+          <li>「圧縮する」を押すと結果が表示されます</li>
+          <li>「ダウンロード」でJPEG形式で保存されます</li>
+        </ol>
+        <h3>「○KB以下に収める」モード</h3>
+        <p>「200KB以下にしたい」など、サイズの上限が決まっている場合に便利です。自動で画質を調整してそのサイズに収めます。</p>
+        <h3>プライバシーについて</h3>
+        <p>アップロードされた画像はすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const controls = document.getElementById('controls');
+    const modeSelect = document.getElementById('mode-select');
+    const qualityGroup = document.getElementById('quality-group');
+    const targetGroup = document.getElementById('target-group');
+    const qualitySlider = document.getElementById('quality-slider');
+    const qualityLabel = document.getElementById('quality-label');
+    const targetInput = document.getElementById('target-size');
+    const compressBtn = document.getElementById('compress-btn');
+    const resultEl = document.getElementById('result');
+    const resultPreview = document.getElementById('result-preview');
+    const originalSizeEl = document.getElementById('original-size');
+    const compressedSizeEl = document.getElementById('compressed-size');
+    const reductionRateEl = document.getElementById('reduction-rate');
+    const dlBtn = document.getElementById('dl-btn');
+    const newBtn = document.getElementById('new-btn');
+
+    let sourceFile = null;
+    let sourceImg = null;
+    let compressedBlob = null;
+
+    // Upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => loadFile(e.target.files[0]));
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+    });
+
+    function loadFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      sourceFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          sourceImg = img;
+          uploadArea.classList.add('hidden');
+          controls.classList.remove('hidden');
+          resultEl.classList.add('hidden');
+          originalSizeEl.textContent = formatSize(file.size);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Mode switch
+    modeSelect.addEventListener('change', () => {
+      if (modeSelect.value === 'quality') {
+        qualityGroup.classList.remove('hidden');
+        targetGroup.classList.add('hidden');
+      } else {
+        qualityGroup.classList.add('hidden');
+        targetGroup.classList.remove('hidden');
+      }
+    });
+
+    qualitySlider.addEventListener('input', () => {
+      qualityLabel.textContent = qualitySlider.value;
+    });
+
+    // Compress
+    compressBtn.addEventListener('click', () => {
+      if (!sourceImg) return;
+      if (modeSelect.value === 'quality') {
+        compressWithQuality(parseInt(qualitySlider.value) / 100);
+      } else {
+        compressToTarget(parseInt(targetInput.value) * 1024);
+      }
+    });
+
+    function compressWithQuality(quality) {
+      const canvas = document.createElement('canvas');
+      canvas.width = sourceImg.width;
+      canvas.height = sourceImg.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(sourceImg, 0, 0);
+
+      canvas.toBlob((blob) => {
+        showResult(blob);
+      }, 'image/jpeg', quality);
+    }
+
+    function compressToTarget(targetBytes) {
+      const canvas = document.createElement('canvas');
+      canvas.width = sourceImg.width;
+      canvas.height = sourceImg.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(sourceImg, 0, 0);
+
+      let lo = 0.01, hi = 1.0;
+      let bestBlob = null;
+
+      function tryQuality(q, cb) {
+        canvas.toBlob((blob) => cb(blob), 'image/jpeg', q);
+      }
+
+      // Binary search for target size
+      let steps = 0;
+      function search() {
+        if (steps > 15 || hi - lo < 0.01) {
+          // Final pass with best quality that fits
+          const finalQ = bestBlob ? (lo + hi) / 2 : lo;
+          tryQuality(finalQ, (blob) => {
+            showResult(bestBlob || blob);
+          });
+          return;
+        }
+        const mid = (lo + hi) / 2;
+        tryQuality(mid, (blob) => {
+          if (blob.size <= targetBytes) {
+            bestBlob = blob;
+            lo = mid;
+          } else {
+            hi = mid;
+          }
+          steps++;
+          search();
+        });
+      }
+      search();
+    }
+
+    function showResult(blob) {
+      compressedBlob = blob;
+      const url = URL.createObjectURL(blob);
+      resultPreview.src = url;
+      compressedSizeEl.textContent = formatSize(blob.size);
+      const rate = ((1 - blob.size / sourceFile.size) * 100).toFixed(1);
+      reductionRateEl.textContent = rate + '% 削減';
+      resultEl.classList.remove('hidden');
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // Download
+    dlBtn.addEventListener('click', () => {
+      if (!compressedBlob) return;
+      const link = document.createElement('a');
+      link.download = 'compressed.jpg';
+      link.href = URL.createObjectURL(compressedBlob);
+      link.click();
+    });
+
+    // New
+    newBtn.addEventListener('click', () => {
+      controls.classList.add('hidden');
+      uploadArea.classList.remove('hidden');
+      resultEl.classList.add('hidden');
+      fileInput.value = '';
+      sourceFile = null;
+      sourceImg = null;
+    });
+  </script>
+</body>
+</html>
