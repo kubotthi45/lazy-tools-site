@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全角半角変換 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="テキストの全角英数字・カタカナを半角に、半角を全角にサクッと変換。コピペするだけ。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/zen-han/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="全角半角変換 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="全角⇔半角をサクッと変換。コピペするだけで使えます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/zen-han/">
+
+  <style>
+    .convert-layout {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .convert-box {
+      flex: 1;
+      min-width: 250px;
+    }
+    .convert-box textarea {
+      min-height: 180px;
+      font-size: 0.95rem;
+    }
+
+    .convert-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .option-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .option-row label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: normal;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .option-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .copy-btn {
+      font-size: 0.85rem;
+      padding: 6px 14px;
+    }
+    .copy-msg {
+      font-size: 0.8rem;
+      color: #16a34a;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .copy-msg.show { opacity: 1; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">全角半角変換</h1>
+      <p class="tool-description">テキストをコピペして、全角⇔半角をサクッと変換。英数字・カタカナ・記号に対応。</p>
+
+      <div class="tool-panel">
+        <div class="option-row">
+          <span style="font-weight:600;font-size:0.9rem;">変換対象:</span>
+          <label><input type="checkbox" id="opt-alpha" checked> 英字（Ａ↔A）</label>
+          <label><input type="checkbox" id="opt-num" checked> 数字（１↔1）</label>
+          <label><input type="checkbox" id="opt-kana" checked> カタカナ（ｶﾀｶﾅ↔カタカナ）</label>
+          <label><input type="checkbox" id="opt-symbol" checked> 記号（！↔!）</label>
+          <label><input type="checkbox" id="opt-space" checked> スペース（　↔ ）</label>
+        </div>
+
+        <div class="convert-layout">
+          <div class="convert-box">
+            <label for="input-text">変換前のテキスト</label>
+            <textarea id="input-text" placeholder="ここにテキストを貼り付けてください"></textarea>
+          </div>
+          <div class="convert-box">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <label for="output-text" style="margin-bottom:0;">変換後のテキスト</label>
+              <button id="copy-btn" class="btn btn-secondary copy-btn">コピー</button>
+              <span id="copy-msg" class="copy-msg">コピーしました</span>
+            </div>
+            <textarea id="output-text" readonly></textarea>
+          </div>
+        </div>
+
+        <div class="convert-actions">
+          <button id="to-han" class="btn btn-primary">全角 → 半角</button>
+          <button id="to-zen" class="btn btn-primary">半角 → 全角</button>
+          <button id="clear-btn" class="btn btn-secondary">クリア</button>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>全角半角変換ツールの使い方</h2>
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>左のテキスト欄に変換したいテキストを貼り付けます</li>
+          <li>「全角→半角」または「半角→全角」ボタンを押します</li>
+          <li>右の欄に変換結果が表示されます</li>
+          <li>「コピー」ボタンで結果をコピーできます</li>
+        </ol>
+        <h3>変換対象の選択</h3>
+        <p>英字・数字・カタカナ・記号・スペースのそれぞれについて、変換するかどうかを選べます。例えば「数字だけ半角にしたい」場合は、数字だけにチェックを入れてください。</p>
+        <h3>プライバシーについて</h3>
+        <p>入力されたテキストはすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const inputText = document.getElementById('input-text');
+    const outputText = document.getElementById('output-text');
+    const toHanBtn = document.getElementById('to-han');
+    const toZenBtn = document.getElementById('to-zen');
+    const clearBtn = document.getElementById('clear-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const copyMsg = document.getElementById('copy-msg');
+    const optAlpha = document.getElementById('opt-alpha');
+    const optNum = document.getElementById('opt-num');
+    const optKana = document.getElementById('opt-kana');
+    const optSymbol = document.getElementById('opt-symbol');
+    const optSpace = document.getElementById('opt-space');
+
+    // 全角→半角
+    toHanBtn.addEventListener('click', () => {
+      let text = inputText.value;
+      if (optAlpha.checked || optNum.checked || optSymbol.checked) {
+        text = text.replace(/[！-～]/g, (ch) => {
+          const code = ch.charCodeAt(0) - 0xFF01 + 0x21;
+          const c = String.fromCharCode(code);
+          if (!optAlpha.checked && /[a-zA-Z]/.test(c)) return ch;
+          if (!optNum.checked && /[0-9]/.test(c)) return ch;
+          if (!optSymbol.checked && !/[a-zA-Z0-9]/.test(c)) return ch;
+          return c;
+        });
+      }
+      if (optKana.checked) {
+        const kanaMap = {'ガ':'ｶﾞ','ギ':'ｷﾞ','グ':'ｸﾞ','ゲ':'ｹﾞ','ゴ':'ｺﾞ','ザ':'ｻﾞ','ジ':'ｼﾞ','ズ':'ｽﾞ','ゼ':'ｾﾞ','ゾ':'ｿﾞ','ダ':'ﾀﾞ','ヂ':'ﾁﾞ','ヅ':'ﾂﾞ','デ':'ﾃﾞ','ド':'ﾄﾞ','バ':'ﾊﾞ','ビ':'ﾋﾞ','ブ':'ﾌﾞ','ベ':'ﾍﾞ','ボ':'ﾎﾞ','パ':'ﾊﾟ','ピ':'ﾋﾟ','プ':'ﾌﾟ','ペ':'ﾍﾟ','ポ':'ﾎﾟ','ヴ':'ｳﾞ','ア':'ｱ','イ':'ｲ','ウ':'ｳ','エ':'ｴ','オ':'ｵ','カ':'ｶ','キ':'ｷ','ク':'ｸ','ケ':'ｹ','コ':'ｺ','サ':'ｻ','シ':'ｼ','ス':'ｽ','セ':'ｾ','ソ':'ｿ','タ':'ﾀ','チ':'ﾁ','ツ':'ﾂ','テ':'ﾃ','ト':'ﾄ','ナ':'ﾅ','ニ':'ﾆ','ヌ':'ﾇ','ネ':'ﾈ','ノ':'ﾉ','ハ':'ﾊ','ヒ':'ﾋ','フ':'ﾌ','ヘ':'ﾍ','ホ':'ﾎ','マ':'ﾏ','ミ':'ﾐ','ム':'ﾑ','メ':'ﾒ','モ':'ﾓ','ヤ':'ﾔ','ユ':'ﾕ','ヨ':'ﾖ','ラ':'ﾗ','リ':'ﾘ','ル':'ﾙ','レ':'ﾚ','ロ':'ﾛ','ワ':'ﾜ','ヲ':'ｦ','ン':'ﾝ','ァ':'ｧ','ィ':'ｨ','ゥ':'ｩ','ェ':'ｪ','ォ':'ｫ','ッ':'ｯ','ャ':'ｬ','ュ':'ｭ','ョ':'ｮ','ー':'ｰ','。':'｡','「':'｢','」':'｣','、':'､','・':'･'};
+        const re = new RegExp(Object.keys(kanaMap).join('|'), 'g');
+        text = text.replace(re, (m) => kanaMap[m] || m);
+      }
+      if (optSpace.checked) {
+        text = text.replace(/　/g, ' ');
+      }
+      outputText.value = text;
+    });
+
+    // 半角→全角
+    toZenBtn.addEventListener('click', () => {
+      let text = inputText.value;
+      if (optAlpha.checked || optNum.checked || optSymbol.checked) {
+        text = text.replace(/[!-~]/g, (ch) => {
+          const c = ch;
+          if (!optAlpha.checked && /[a-zA-Z]/.test(c)) return ch;
+          if (!optNum.checked && /[0-9]/.test(c)) return ch;
+          if (!optSymbol.checked && !/[a-zA-Z0-9]/.test(c)) return ch;
+          return String.fromCharCode(ch.charCodeAt(0) - 0x21 + 0xFF01);
+        });
+      }
+      if (optKana.checked) {
+        const hankanaMap = {'ｶﾞ':'ガ','ｷﾞ':'ギ','ｸﾞ':'グ','ｹﾞ':'ゲ','ｺﾞ':'ゴ','ｻﾞ':'ザ','ｼﾞ':'ジ','ｽﾞ':'ズ','ｾﾞ':'ゼ','ｿﾞ':'ゾ','ﾀﾞ':'ダ','ﾁﾞ':'ヂ','ﾂﾞ':'ヅ','ﾃﾞ':'デ','ﾄﾞ':'ド','ﾊﾞ':'バ','ﾋﾞ':'ビ','ﾌﾞ':'ブ','ﾍﾞ':'ベ','ﾎﾞ':'ボ','ﾊﾟ':'パ','ﾋﾟ':'ピ','ﾌﾟ':'プ','ﾍﾟ':'ペ','ﾎﾟ':'ポ','ｳﾞ':'ヴ','ｱ':'ア','ｲ':'イ','ｳ':'ウ','ｴ':'エ','ｵ':'オ','ｶ':'カ','ｷ':'キ','ｸ':'ク','ｹ':'ケ','ｺ':'コ','ｻ':'サ','ｼ':'シ','ｽ':'ス','ｾ':'セ','ｿ':'ソ','ﾀ':'タ','ﾁ':'チ','ﾂ':'ツ','ﾃ':'テ','ﾄ':'ト','ﾅ':'ナ','ﾆ':'ニ','ﾇ':'ヌ','ﾈ':'ネ','ﾉ':'ノ','ﾊ':'ハ','ﾋ':'ヒ','ﾌ':'フ','ﾍ':'ヘ','ﾎ':'ホ','ﾏ':'マ','ﾐ':'ミ','ﾑ':'ム','ﾒ':'メ','ﾓ':'モ','ﾔ':'ヤ','ﾕ':'ユ','ﾖ':'ヨ','ﾗ':'ラ','ﾘ':'リ','ﾙ':'ル','ﾚ':'レ','ﾛ':'ロ','ﾜ':'ワ','ｦ':'ヲ','ﾝ':'ン','ｧ':'ァ','ｨ':'ィ','ｩ':'ゥ','ｪ':'ェ','ｫ':'ォ','ｯ':'ッ','ｬ':'ャ','ｭ':'ュ','ｮ':'ョ','ｰ':'ー','｡':'。','｢':'「','｣':'」','､':'、','･':'・'};
+        // 濁点・半濁点の2文字組を先に変換
+        const re2 = new RegExp(Object.keys(hankanaMap).sort((a,b) => b.length - a.length).join('|'), 'g');
+        text = text.replace(re2, (m) => hankanaMap[m] || m);
+      }
+      if (optSpace.checked) {
+        text = text.replace(/ /g, '　');
+      }
+      outputText.value = text;
+    });
+
+    // クリア
+    clearBtn.addEventListener('click', () => {
+      inputText.value = '';
+      outputText.value = '';
+    });
+
+    // コピー
+    copyBtn.addEventListener('click', () => {
+      if (!outputText.value) return;
+      navigator.clipboard.writeText(outputText.value).then(() => {
+        copyMsg.classList.add('show');
+        setTimeout(() => copyMsg.classList.remove('show'), 2000);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>パスワード生成 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="安全なパスワードをサクッと生成。文字数や使う文字の種類を選べます。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/password-gen/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="パスワード生成 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="安全なパスワードをサクッと生成。文字数・記号の有無を選べます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/password-gen/">
+
+  <style>
+    .password-display {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .password-text {
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      word-break: break-all;
+      letter-spacing: 1px;
+      color: var(--color-text);
+      user-select: all;
+      line-height: 1.6;
+    }
+
+    .strength-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--color-border);
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s, background 0.3s;
+    }
+    .strength-label {
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 500px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+
+    .option-item label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: normal;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    .option-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .length-control {
+      margin-bottom: 16px;
+    }
+    .length-control input[type="range"] {
+      width: 100%;
+    }
+    .length-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .count-control {
+      margin-bottom: 16px;
+    }
+
+    .multi-passwords {
+      margin-top: 16px;
+    }
+    .multi-passwords .pw-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .multi-passwords .pw-row:last-child { border-bottom: none; }
+    .pw-num {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      min-width: 24px;
+    }
+    .pw-value {
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.95rem;
+      word-break: break-all;
+      flex: 1;
+    }
+    .pw-copy {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .pw-copy:hover { background: var(--color-border); }
+
+    .copy-msg {
+      font-size: 0.8rem;
+      color: #16a34a;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .copy-msg.show { opacity: 1; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">パスワード生成</h1>
+      <p class="tool-description">安全なパスワードをサクッと作れます。文字数や使う文字の種類を自由に選べます。</p>
+
+      <div class="tool-panel">
+        <!-- 長さ -->
+        <div class="length-control">
+          <label>文字数: <span class="length-value" id="length-label">16</span></label>
+          <input type="range" id="length-slider" min="4" max="64" value="16">
+        </div>
+
+        <!-- オプション -->
+        <div class="options-grid">
+          <div class="option-item">
+            <label><input type="checkbox" id="opt-upper" checked> 大文字（A〜Z）</label>
+          </div>
+          <div class="option-item">
+            <label><input type="checkbox" id="opt-lower" checked> 小文字（a〜z）</label>
+          </div>
+          <div class="option-item">
+            <label><input type="checkbox" id="opt-digits" checked> 数字（0〜9）</label>
+          </div>
+          <div class="option-item">
+            <label><input type="checkbox" id="opt-symbols" checked> 記号（!@#$%など）</label>
+          </div>
+        </div>
+
+        <!-- 生成個数 -->
+        <div class="count-control">
+          <label>一度に生成する数:</label>
+          <select id="count-select">
+            <option value="1">1個</option>
+            <option value="3">3個</option>
+            <option value="5" selected>5個</option>
+            <option value="10">10個</option>
+          </select>
+        </div>
+
+        <!-- 生成ボタン -->
+        <button id="generate-btn" class="btn btn-primary" style="width:100%;">パスワードを生成</button>
+
+        <!-- 結果 -->
+        <div id="result" class="multi-passwords"></div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>パスワード生成ツールの使い方</h2>
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>文字数をスライダーで調整します（推奨: 12文字以上）</li>
+          <li>使いたい文字の種類にチェックを入れます</li>
+          <li>「パスワードを生成」ボタンを押します</li>
+          <li>気に入ったパスワードの「コピー」ボタンでコピーできます</li>
+        </ol>
+        <h3>安全なパスワードとは？</h3>
+        <p>大文字・小文字・数字・記号を混ぜて、12文字以上にするのがおすすめです。同じパスワードを複数のサービスで使い回さないようにしましょう。</p>
+        <h3>プライバシーについて</h3>
+        <p>生成されたパスワードはすべてお使いのブラウザ内で作られます。サーバーへの送信は一切行いません。</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const lengthSlider = document.getElementById('length-slider');
+    const lengthLabel = document.getElementById('length-label');
+    const optUpper = document.getElementById('opt-upper');
+    const optLower = document.getElementById('opt-lower');
+    const optDigits = document.getElementById('opt-digits');
+    const optSymbols = document.getElementById('opt-symbols');
+    const countSelect = document.getElementById('count-select');
+    const generateBtn = document.getElementById('generate-btn');
+    const resultEl = document.getElementById('result');
+
+    const CHARS_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const CHARS_LOWER = 'abcdefghijklmnopqrstuvwxyz';
+    const CHARS_DIGITS = '0123456789';
+    const CHARS_SYMBOLS = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+
+    lengthSlider.addEventListener('input', () => {
+      lengthLabel.textContent = lengthSlider.value;
+    });
+
+    generateBtn.addEventListener('click', generate);
+
+    // 初回自動生成
+    window.addEventListener('DOMContentLoaded', generate);
+
+    function generate() {
+      let pool = '';
+      if (optUpper.checked) pool += CHARS_UPPER;
+      if (optLower.checked) pool += CHARS_LOWER;
+      if (optDigits.checked) pool += CHARS_DIGITS;
+      if (optSymbols.checked) pool += CHARS_SYMBOLS;
+
+      if (pool.length === 0) {
+        resultEl.innerHTML = '<p style="color:var(--color-text-muted);padding:16px;text-align:center;">1つ以上の文字種を選んでください</p>';
+        return;
+      }
+
+      const len = parseInt(lengthSlider.value);
+      const count = parseInt(countSelect.value);
+      let html = '';
+
+      for (let i = 0; i < count; i++) {
+        const pw = generateOne(pool, len);
+        const strength = getStrength(pw, pool);
+        html += `
+          <div class="pw-row">
+            <span class="pw-num">${i + 1}.</span>
+            <span class="pw-value">${escapeHtml(pw)}</span>
+            <button class="pw-copy" onclick="copyPw(this, '${escapeAttr(pw)}')">コピー</button>
+            <span class="copy-msg" id="msg-${i}"></span>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" style="width:${strength.pct}%;background:${strength.color};"></div></div>
+        `;
+      }
+      resultEl.innerHTML = html;
+    }
+
+    function generateOne(pool, len) {
+      const arr = new Uint32Array(len);
+      crypto.getRandomValues(arr);
+      let pw = '';
+      for (let i = 0; i < len; i++) {
+        pw += pool[arr[i] % pool.length];
+      }
+      return pw;
+    }
+
+    function getStrength(pw) {
+      let score = 0;
+      if (pw.length >= 8) score++;
+      if (pw.length >= 12) score++;
+      if (pw.length >= 16) score++;
+      if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+      if (/\d/.test(pw)) score++;
+      if (/[^a-zA-Z0-9]/.test(pw)) score++;
+
+      if (score <= 2) return { pct: 30, color: '#ef4444' };
+      if (score <= 3) return { pct: 50, color: '#f59e0b' };
+      if (score <= 4) return { pct: 75, color: '#3b82f6' };
+      return { pct: 100, color: '#16a34a' };
+    }
+
+    function copyPw(btn, pw) {
+      navigator.clipboard.writeText(pw).then(() => {
+        const msg = btn.nextElementSibling;
+        msg.textContent = 'コピーしました';
+        msg.classList.add('show');
+        setTimeout(() => msg.classList.remove('show'), 2000);
+      });
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function escapeAttr(s) {
+      return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+    }
+  </script>
+</body>
+</html>
