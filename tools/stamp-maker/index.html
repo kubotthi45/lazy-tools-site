@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>電子印鑑作成 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="名前を入力するだけで電子印鑑を作成。丸印・角印対応、フォント選択可能。透明背景PNGでダウンロード。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/stamp-maker/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="電子印鑑作成 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="名前を入力するだけで電子印鑑を作成。WordやExcelにそのまま貼れます。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/stamp-maker/">
+  <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/stamp-maker.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "作った電子印鑑は仕事で使えますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "社内書類やPDFへの押印には十分お使いいただけます。ただし法的な実印・認印の代わりにはなりません。電子契約には電子署名サービスをご利用ください。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "データはどこかに保存されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。入力された名前はすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "透明背景で保存できますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "はい。背景を「透明」に設定すれば、透過PNG形式で保存されます。WordやExcelに貼り付けても背景が邪魔になりません。"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Google Fonts 日本語 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700&family=Noto+Sans+JP:wght@700&family=Klee+One:wght@600&family=Zen+Kurenaido&family=Yuji+Syuku&family=Hachi+Maru+Pop&display=swap" rel="stylesheet">
+  <style>
+    /* フォントを事前にロードするための非表示テキスト */
+    .font-preload {
+      position: absolute;
+      left: -9999px;
+      font-size: 1px;
+      visibility: hidden;
+    }
+  </style>
+
+  <style>
+    .editor-layout {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .editor-controls {
+      flex: 1;
+      min-width: 260px;
+    }
+    .preview-area {
+      flex: 1;
+      min-width: 260px;
+      text-align: center;
+    }
+
+    .preview-bg {
+      display: inline-block;
+      padding: 20px;
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+    }
+    .preview-bg.white { background: #fff; border: 1px solid var(--color-border); }
+    .preview-bg.checker {
+      background-image:
+        linear-gradient(45deg, #ccc 25%, transparent 25%),
+        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%),
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      border: 1px solid var(--color-border);
+    }
+
+    .preview-canvas {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .option-group {
+      margin-bottom: 16px;
+    }
+    .option-group label {
+      margin-bottom: 6px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: normal;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+    .radio-group input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .color-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-picker-row input[type="color"] {
+      width: 40px;
+      height: 36px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 2px;
+    }
+    .color-picker-row span {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol, .how-to ul { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <!-- 全フォントを事前ロード -->
+  <div class="font-preload">
+    <span style="font-family:'Noto Serif JP'">印</span>
+    <span style="font-family:'Noto Sans JP'">印</span>
+    <span style="font-family:'Klee One'">印</span>
+    <span style="font-family:'Yuji Syuku'">印</span>
+    <span style="font-family:'Zen Kurenaido'">印</span>
+    <span style="font-family:'Hachi Maru Pop'">印</span>
+  </div>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">電子印鑑作成</h1>
+      <p class="tool-description">名前を入力するだけで電子印鑑を作成。WordやExcelにそのまま貼り付けられます。</p>
+
+      <div class="tool-panel">
+        <div class="editor-layout">
+          <div class="editor-controls">
+            <!-- 名前入力 -->
+            <div class="option-group">
+              <label for="stamp-name">名前（1〜4文字）</label>
+              <input type="text" id="stamp-name" value="山田" maxlength="4" placeholder="例: 山田">
+            </div>
+
+            <!-- 印鑑の形 -->
+            <div class="option-group">
+              <label>印鑑の形</label>
+              <div class="radio-group">
+                <label><input type="radio" name="shape" value="circle" checked> 丸印</label>
+                <label><input type="radio" name="shape" value="square"> 角印</label>
+              </div>
+            </div>
+
+            <!-- 文字の向き -->
+            <div class="option-group">
+              <label>文字の向き</label>
+              <div class="radio-group">
+                <label><input type="radio" name="direction" value="vertical" checked> 縦書き</label>
+                <label><input type="radio" name="direction" value="horizontal"> 横書き</label>
+              </div>
+            </div>
+
+            <!-- フォント -->
+            <div class="option-group">
+              <label for="font-select">フォント</label>
+              <select id="font-select">
+                <option value="Noto Serif JP">明朝体</option>
+                <option value="Noto Sans JP">ゴシック体</option>
+                <option value="Klee One">教科書体風</option>
+                <option value="Yuji Syuku">毛筆体</option>
+                <option value="Zen Kurenaido">丸ゴシック</option>
+                <option value="Hachi Maru Pop">手書き風</option>
+              </select>
+            </div>
+
+            <!-- 2行表示（3文字以上で表示） -->
+            <div class="option-group" id="twoline-group" style="display:none;">
+              <label>2行に分ける</label>
+              <div class="radio-group">
+                <label><input type="radio" name="twoline" value="no" checked> 1行のまま</label>
+                <label><input type="radio" name="twoline" value="yes"> 2行に分ける</label>
+              </div>
+            </div>
+
+            <!-- 余白（枠と文字の間） -->
+            <div class="option-group">
+              <label>枠と文字の余白: <span id="padding-label">15</span>%</label>
+              <input type="range" id="stamp-padding" min="5" max="35" value="15" style="width:100%;">
+            </div>
+
+            <!-- 印鑑の色 -->
+            <div class="option-group">
+              <label>印鑑の色</label>
+              <div class="color-picker-row">
+                <input type="color" id="stamp-color" value="#cc0000">
+                <span id="color-label">#cc0000</span>
+              </div>
+            </div>
+
+            <!-- 背景 -->
+            <div class="option-group">
+              <label>背景</label>
+              <div class="radio-group">
+                <label><input type="radio" name="bg" value="transparent" checked> 透明</label>
+                <label><input type="radio" name="bg" value="white"> 白</label>
+              </div>
+            </div>
+
+            <!-- サイズ -->
+            <div class="option-group">
+              <label>サイズ: <span id="size-label">200</span>px</label>
+              <input type="range" id="stamp-size" min="80" max="400" value="200" style="width:100%;">
+            </div>
+          </div>
+
+          <div class="preview-area">
+            <label>プレビュー:</label>
+            <div class="preview-bg checker" id="preview-bg">
+              <canvas id="stamp-canvas" class="preview-canvas" width="200" height="200"></canvas>
+            </div>
+            <div class="btn-group" style="justify-content:center;margin-top:12px;">
+              <button id="dl-btn" class="btn btn-primary">ダウンロード（PNG）</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>電子印鑑作成ツールの使い方</h2>
+
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>名前を入力します（1〜4文字）</li>
+          <li>印鑑の形・文字の向き・フォント・色を選びます</li>
+          <li>プレビューを確認して「ダウンロード」を押します</li>
+          <li>PNG画像で保存されます。WordやExcelに画像として挿入してください</li>
+        </ol>
+
+        <h3>こんな場面で使えます</h3>
+        <ul>
+          <li><strong>テレワークで「PDFに印鑑押して返して」と言われた</strong> — 電子印鑑を画像として貼り付ければOK</li>
+          <li><strong>請求書・見積書に印鑑が必要</strong> — 個人事業主やフリーランスの書類作成に</li>
+          <li><strong>社内の回覧文書</strong> — 確認済みの意味で押す認印として</li>
+          <li><strong>実印をスキャンするのが面倒</strong> — このツールなら名前を入力するだけ</li>
+        </ul>
+
+        <h3>透明背景について</h3>
+        <p>背景を「透明」にすると、印鑑の周りが透過されたPNG画像になります。WordやExcel、PDFに貼り付けても背景の白い四角が出ません。書類の上に自然に重ねられます。</p>
+
+        <h3>フォントについて</h3>
+        <p>明朝体は伝統的な印鑑の雰囲気に近く、ゴシック体はモダンな印象です。公的な書類には明朝体、社内のカジュアルな書類にはゴシック体がおすすめです。</p>
+
+        <h3>注意事項</h3>
+        <p>このツールで作成した電子印鑑は、社内書類やPDFへの簡易的な押印に使えます。ただし、法的な実印・認印・銀行印の代わりにはなりません。正式な電子契約には電子署名サービスをご利用ください。</p>
+
+        <h3>よくある質問</h3>
+        <p><strong>Q. 作った電子印鑑は仕事で使えますか？</strong><br>A. 社内書類やPDFへの押印には十分お使いいただけます。ただし法的な実印・認印の代わりにはなりません。</p>
+        <p><strong>Q. データはどこかに保存されますか？</strong><br>A. いいえ。入力された名前はすべてお使いのブラウザ内で処理されます。サーバーへの送信は一切行いません。</p>
+        <p><strong>Q. 透明背景で保存できますか？</strong><br>A. はい。背景を「透明」に設定すれば、透過PNG形式で保存されます。</p>
+
+        <h3>関連ツール</h3>
+        <ul>
+          <li><a href="/tools/image-compress/">画像圧縮</a> — 印鑑画像のファイルサイズを軽くしたいときに</li>
+          <li><a href="/tools/id-photo/">証明写真サイズ変更</a> — 証明写真を作りたいときに</li>
+          <li><a href="/tools/qr-generator/">QRコード生成</a> — 書類にQRコードを載せたいときに</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const nameInput = document.getElementById('stamp-name');
+    const canvas = document.getElementById('stamp-canvas');
+    const ctx = canvas.getContext('2d');
+    const fontSelect = document.getElementById('font-select');
+    const colorInput = document.getElementById('stamp-color');
+    const colorLabel = document.getElementById('color-label');
+    const sizeSlider = document.getElementById('stamp-size');
+    const sizeLabel = document.getElementById('size-label');
+    const paddingSlider = document.getElementById('stamp-padding');
+    const paddingLabel = document.getElementById('padding-label');
+    const twolineGroup = document.getElementById('twoline-group');
+    const previewBg = document.getElementById('preview-bg');
+    const dlBtn = document.getElementById('dl-btn');
+
+    function getOption(name) {
+      return document.querySelector(`input[name="${name}"]:checked`).value;
+    }
+
+    function updateTwolineVisibility() {
+      const name = nameInput.value || '';
+      twolineGroup.style.display = name.length >= 3 ? '' : 'none';
+    }
+
+    function draw() {
+      const name = nameInput.value || '印';
+      const shape = getOption('shape');
+      const direction = getOption('direction');
+      const bg = getOption('bg');
+      const twoline = name.length >= 3 && getOption('twoline') === 'yes';
+      const color = colorInput.value;
+      const size = parseInt(sizeSlider.value);
+      const paddingPct = parseInt(paddingSlider.value) / 100;
+      const fontFamily = `"${fontSelect.value}", serif`;
+
+      canvas.width = size;
+      canvas.height = size;
+
+      ctx.clearRect(0, 0, size, size);
+      if (bg === 'white') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+        previewBg.className = 'preview-bg white';
+      } else {
+        previewBg.className = 'preview-bg checker';
+      }
+
+      const cx = size / 2;
+      const cy = size / 2;
+      const r = size * 0.45;
+      const lineWidth = Math.max(2, size * 0.025);
+      const innerR = r * (1 - paddingPct);
+
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lineWidth;
+
+      // 枠を描画
+      if (shape === 'circle') {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        const margin = size * 0.08;
+        ctx.strokeRect(margin, margin, size - margin * 2, size - margin * 2);
+      }
+
+      // 文字を描画
+      const chars = name.split('');
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      if (twoline) {
+        // 2行に分ける
+        const mid = Math.ceil(chars.length / 2);
+        const line1 = chars.slice(0, mid);
+        const line2 = chars.slice(mid);
+        const maxLineLen = Math.max(line1.length, line2.length);
+
+        if (direction === 'vertical') {
+          // 縦書き2列（右から左）
+          const fontSize = Math.floor(innerR * 2 / (Math.max(line1.length, line2.length) + 0.5));
+          ctx.font = `bold ${fontSize}px ${fontFamily}`;
+          const colGap = fontSize * 1.1;
+          // 2列を中央に配置（右列=line1, 左列=line2）
+          const startX1 = cx + colGap / 2;
+          const startX2 = cx - colGap / 2;
+          drawVerticalChars(line1, startX1, cy, fontSize);
+          drawVerticalChars(line2, startX2, cy, fontSize);
+        } else {
+          // 横書き2行
+          const fontSize = Math.floor(innerR * 2 / (maxLineLen + 0.5));
+          ctx.font = `bold ${fontSize}px ${fontFamily}`;
+          const rowGap = fontSize * 0.55;
+          drawHorizontalChars(line1, cx, cy - rowGap, fontSize);
+          drawHorizontalChars(line2, cx, cy + rowGap, fontSize);
+        }
+      } else {
+        // 1行
+        const charCount = chars.length;
+        const fontSize = Math.floor(innerR * 2 / charCount);
+        ctx.font = `bold ${fontSize}px ${fontFamily}`;
+
+        if (direction === 'vertical') {
+          drawVerticalChars(chars, cx, cy, fontSize);
+        } else {
+          drawHorizontalChars(chars, cx, cy, fontSize);
+        }
+      }
+    }
+
+    function drawVerticalChars(chars, x, centerY, fontSize) {
+      const totalHeight = fontSize * chars.length;
+      const startY = centerY - totalHeight / 2 + fontSize / 2;
+      for (let i = 0; i < chars.length; i++) {
+        ctx.fillText(chars[i], x, startY + i * fontSize);
+      }
+    }
+
+    function drawHorizontalChars(chars, centerX, y, fontSize) {
+      const totalWidth = fontSize * chars.length;
+      const startX = centerX - totalWidth / 2 + fontSize / 2;
+      for (let i = 0; i < chars.length; i++) {
+        ctx.fillText(chars[i], startX + i * fontSize, y);
+      }
+    }
+
+    // イベント
+    nameInput.addEventListener('input', () => { updateTwolineVisibility(); draw(); });
+    fontSelect.addEventListener('change', () => {
+      // 事前ロード済みだが念のためフォント読み込みを待ってから描画
+      const fontName = fontSelect.value;
+      document.fonts.load(`bold 40px "${fontName}"`).then(() => draw()).catch(() => draw());
+    });
+    colorInput.addEventListener('input', () => { colorLabel.textContent = colorInput.value; draw(); });
+    sizeSlider.addEventListener('input', () => { sizeLabel.textContent = sizeSlider.value; draw(); });
+    paddingSlider.addEventListener('input', () => { paddingLabel.textContent = paddingSlider.value; draw(); });
+    document.querySelectorAll('input[name="shape"]').forEach(el => el.addEventListener('change', draw));
+    document.querySelectorAll('input[name="direction"]').forEach(el => el.addEventListener('change', draw));
+    document.querySelectorAll('input[name="twoline"]').forEach(el => el.addEventListener('change', draw));
+    document.querySelectorAll('input[name="bg"]').forEach(el => el.addEventListener('change', draw));
+
+    // ダウンロード
+    dlBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `stamp_${nameInput.value || 'stamp'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // フォント読み込み完了後に描画
+    document.fonts.ready.then(() => { updateTwolineVisibility(); draw(); });
+  </script>
+</body>
+</html>
