@@ -18,6 +18,39 @@
   <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/image-compress.png">
   <meta name="twitter:card" content="summary_large_image">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "画像はサーバーに送信されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。すべてお使いのブラウザ内で処理されます。画像がインターネットに送信されることはありません。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "圧縮した画像の画質は戻せますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。JPEG圧縮は不可逆（元に戻せない）です。元の画像は別に保存しておくことをおすすめします。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "PNG画像も圧縮できますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PNGをアップロードすることはできますが、出力はJPEG形式になります。透明部分がある画像の場合、背景が白になります。"
+        }
+      }
+    ]
+  }
+  </script>
+
   <style>
     .upload-area {
       border: 2px dashed var(--color-border);

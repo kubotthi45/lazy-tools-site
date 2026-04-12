@@ -18,6 +18,39 @@
   <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/password-gen.png">
   <meta name="twitter:card" content="summary_large_image">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "生成したパスワードはどこかに記録されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。すべてお使いのブラウザ内で生成されます。サーバーへの送信や記録は一切行いません。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "同じパスワードが生成されることはありますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "暗号学的に安全な乱数を使用しているため、同じパスワードが生成される可能性は天文学的に低いです。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "記号を含まないパスワードも作れますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "はい。「記号」のチェックを外せば、英字と数字だけのパスワードを生成できます。記号が使えないサービスもあるためです。"
+        }
+      }
+    ]
+  }
+  </script>
+
   <style>
     .password-display {
       background: var(--color-bg);

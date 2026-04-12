@@ -19,6 +19,39 @@
   <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/qr-generator.png">
   <meta name="twitter:card" content="summary_large_image">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "作ったQRコードは商用利用できますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "はい。このツールで生成したQRコードは自由にお使いいただけます。商用・個人利用を問いません。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "QRコードに有効期限はありますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "QRコード自体に有効期限はありません。ただしリンク先のURLが変わると、読み取っても正しいページに遷移しなくなります。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "データはどこかに保存されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。入力されたデータはすべてお使いのブラウザ内で処理され、サーバーへの送信は一切行いません。"
+        }
+      }
+    ]
+  }
+  </script>
+
   <!-- QRコードライブラリ（CDN） -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
 
