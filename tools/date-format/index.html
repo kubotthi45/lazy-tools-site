@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel日付フォーマット統一 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="Excelファイルの日付書式をバラバラなまま一括統一。複数ブック・複数シート対応。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/date-format/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="Excel日付フォーマット統一 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="Excelファイルの日付書式を一括統一。複数ブック対応。データはサーバーに送りません。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/date-format/">
+  <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/date-format.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "どんな日付形式に対応していますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "yyyy/m/d、yyyy-mm-dd、令和○年○月○日、R○.○.○、yyyymmddなど、Excelで一般的に使われる日付形式に対応しています。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "元のExcelファイルは変更されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。元のファイルはそのまま保持されます。変換前・変換後の両方をダウンロードできるので、見比べて確認できます。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ファイルはサーバーに送信されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。すべてお使いのブラウザ内で処理されます。Excelファイルがインターネットに送信されることはありません。"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- SheetJS (xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+    .upload-area p { color: var(--color-text-muted); margin-top: 8px; font-size: 0.9rem; }
+
+    .file-list {
+      margin-bottom: 16px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+    .file-item .file-name { font-weight: 600; }
+    .file-item .file-info { color: var(--color-text-muted); font-size: 0.8rem; }
+    .file-item .remove-btn {
+      background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem; padding: 0 4px;
+    }
+
+    .result-section {
+      margin-top: 20px;
+    }
+    .result-summary {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .result-summary h3 { font-size: 1rem; margin-bottom: 8px; }
+    .result-summary p { font-size: 0.9rem; margin: 4px 0; }
+    .result-summary .count { font-weight: 700; color: var(--color-primary); }
+
+    .change-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+    .change-table th, .change-table td {
+      border: 1px solid var(--color-border);
+      padding: 6px 10px;
+      text-align: left;
+    }
+    .change-table th { background: var(--color-bg); font-weight: 600; }
+    .change-table .before { color: #ef4444; }
+    .change-table .after { color: #16a34a; font-weight: 600; }
+
+    .dl-section {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .hidden { display: none !important; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol, .how-to ul { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">Excel日付フォーマット統一</h1>
+      <p class="tool-description">Excelファイル内のバラバラな日付書式を、一括で統一します。複数ブック・複数シート対応。データはサーバーに送信しません。</p>
+
+      <div class="tool-panel">
+        <!-- アップロード -->
+        <div id="upload-area" class="upload-area">
+          <strong>Excelファイルをドラッグ&ドロップ（複数可）</strong>
+          <p>.xlsx / .xls 対応</p>
+          <input type="file" id="file-input" accept=".xlsx,.xls" multiple style="display:none">
+        </div>
+
+        <!-- ファイル一覧 -->
+        <div id="file-list" class="file-list"></div>
+
+        <!-- 出力形式 -->
+        <div class="form-group">
+          <label for="format-select">統一する日付形式</label>
+          <select id="format-select">
+            <option value="yyyy/MM/dd">yyyy/MM/dd（2026/04/13）</option>
+            <option value="yyyy-MM-dd">yyyy-MM-dd（2026-04-13）</option>
+            <option value="yyyy年M月d日">yyyy年M月d日（2026年4月13日）</option>
+            <option value="wareki">令和○年M月d日（令和8年4月13日）</option>
+            <option value="yyyyMMdd">yyyyMMdd（20260413）</option>
+            <option value="MM/dd">MM/dd（04/13）</option>
+            <option value="M月d日">M月d日（4月13日）</option>
+          </select>
+        </div>
+
+        <!-- 変換ボタン -->
+        <button id="convert-btn" class="btn btn-primary" style="width:100%;" disabled>日付を統一する</button>
+
+        <!-- 結果 -->
+        <div id="result-section" class="result-section hidden">
+          <div class="result-summary">
+            <h3>変換結果</h3>
+            <p>処理ファイル数: <span class="count" id="file-count"></span></p>
+            <p>処理シート数: <span class="count" id="sheet-count"></span></p>
+            <p>変換したセル数: <span class="count" id="cell-count"></span></p>
+          </div>
+
+          <!-- 変更一覧（先頭20件） -->
+          <details>
+            <summary style="cursor:pointer;font-weight:600;margin-bottom:8px;">変更内容を確認（先頭20件）</summary>
+            <table class="change-table" id="change-table">
+              <thead><tr><th>ファイル</th><th>シート</th><th>セル</th><th>変換前</th><th>変換後</th></tr></thead>
+              <tbody id="change-tbody"></tbody>
+            </table>
+          </details>
+
+          <!-- ダウンロード -->
+          <div class="dl-section">
+            <button id="dl-converted" class="btn btn-primary">変換後ファイルをダウンロード</button>
+            <button id="dl-original" class="btn btn-secondary">元ファイルをダウンロード</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <button id="reset-btn" class="btn btn-secondary hidden">最初からやり直す</button>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>Excel日付フォーマット統一ツールの使い方</h2>
+
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>Excelファイルをドラッグ&ドロップします（複数ファイル可）</li>
+          <li>統一したい日付形式を選びます</li>
+          <li>「日付を統一する」ボタンを押します</li>
+          <li>変更内容を確認し、「変換後ファイルをダウンロード」で保存します</li>
+          <li>元ファイルも「元ファイルをダウンロード」でいつでも取り出せます</li>
+        </ol>
+
+        <h3>こんな場面で使えます</h3>
+        <ul>
+          <li><strong>複数の部署からもらったExcelの日付形式がバラバラ</strong> — 「2026/4/13」「令和8年4月13日」「2026-04-13」を一括統一</li>
+          <li><strong>取引先ごとに日付の書き方が違う</strong> — 集計前にフォーマットを揃える</li>
+          <li><strong>古いExcelファイルの日付を最新の書式に更新したい</strong></li>
+          <li><strong>CSVインポート前にデータを整える</strong></li>
+        </ul>
+
+        <h3>対応する日付形式</h3>
+        <ul>
+          <li>yyyy/m/d, yyyy/mm/dd（2026/4/13, 2026/04/13）</li>
+          <li>yyyy-m-d, yyyy-mm-dd（2026-4-13, 2026-04-13）</li>
+          <li>yyyy年m月d日（2026年4月13日）</li>
+          <li>令和○年m月d日, R○.m.d（令和8年4月13日, R8.4.13）</li>
+          <li>平成○年m月d日, H○.m.d</li>
+          <li>yyyymmdd（20260413）</li>
+          <li>Excelのシリアル値（日付として書式設定されたセル）</li>
+        </ul>
+
+        <h3>注意事項</h3>
+        <p>セルの背景色・フォント・罫線などの見た目は、変換後のファイルでは一部変わる場合があります。データの値は正確に保持されます。元ファイルは変更されないので、見た目の確認は元ファイルと見比べてください。</p>
+
+        <h3>よくある質問</h3>
+        <p><strong>Q. 日付以外のデータは変更されますか？</strong><br>A. いいえ。日付と判定されたセルのみ変換します。数値・テキスト・数式などはそのまま保持されます。</p>
+        <p><strong>Q. 元のExcelファイルは変更されますか？</strong><br>A. いいえ。元ファイルはブラウザ内にそのまま保持されます。変換前・変換後の両方をダウンロードできます。</p>
+        <p><strong>Q. ファイルはサーバーに送信されますか？</strong><br>A. いいえ。すべてお使いのブラウザ内で処理されます。</p>
+
+        <h3>関連ツール</h3>
+        <ul>
+          <li><a href="/tools/zen-han/">全角半角変換</a> — テキストの全角⇔半角を変換したいときに</li>
+          <li><a href="/tools/stamp-maker/">電子印鑑作成</a> — Excelの書類に印鑑を押したいときに</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const fileListEl = document.getElementById('file-list');
+    const formatSelect = document.getElementById('format-select');
+    const convertBtn = document.getElementById('convert-btn');
+    const resultSection = document.getElementById('result-section');
+    const fileCountEl = document.getElementById('file-count');
+    const sheetCountEl = document.getElementById('sheet-count');
+    const cellCountEl = document.getElementById('cell-count');
+    const changeTbody = document.getElementById('change-tbody');
+    const dlConverted = document.getElementById('dl-converted');
+    const dlOriginal = document.getElementById('dl-original');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // 和暦テーブル
+    const WAREKI = [
+      { name: '令和', short: 'R', start: 2019 },
+      { name: '平成', short: 'H', start: 1989 },
+      { name: '昭和', short: 'S', start: 1926 },
+      { name: '大正', short: 'T', start: 1912 },
+    ];
+
+    let uploadedFiles = []; // { name, originalBlob, arrayBuffer }
+    let convertedWorkbooks = []; // { name, workbook }
+    let changeLog = [];
+
+    // Upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => addFiles(e.target.files));
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      addFiles(e.dataTransfer.files);
+    });
+
+    function addFiles(files) {
+      for (const file of files) {
+        if (!file.name.match(/\.xlsx?$/i)) continue;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedFiles.push({
+            name: file.name,
+            originalBlob: new Blob([e.target.result]),
+            arrayBuffer: e.target.result
+          });
+          renderFileList();
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    }
+
+    function renderFileList() {
+      fileListEl.innerHTML = uploadedFiles.map((f, i) => `
+        <div class="file-item">
+          <div>
+            <span class="file-name">${escapeHtml(f.name)}</span>
+          </div>
+          <button class="remove-btn" onclick="removeFile(${i})">✕</button>
+        </div>
+      `).join('');
+      convertBtn.disabled = uploadedFiles.length === 0;
+    }
+
+    function removeFile(i) {
+      uploadedFiles.splice(i, 1);
+      renderFileList();
+    }
+
+    // 日付パターン（文字列から検出）
+    const DATE_PATTERNS = [
+      // yyyy/m/d or yyyy/mm/dd
+      { re: /^(\d{4})[\/](\d{1,2})[\/](\d{1,2})$/, parse: (m) => ({ y: +m[1], mo: +m[2], d: +m[3] }) },
+      // yyyy-m-d or yyyy-mm-dd
+      { re: /^(\d{4})-(\d{1,2})-(\d{1,2})$/, parse: (m) => ({ y: +m[1], mo: +m[2], d: +m[3] }) },
+      // yyyymmdd
+      { re: /^(\d{4})(\d{2})(\d{2})$/, parse: (m) => ({ y: +m[1], mo: +m[2], d: +m[3] }) },
+      // yyyy年m月d日
+      { re: /^(\d{4})年(\d{1,2})月(\d{1,2})日$/, parse: (m) => ({ y: +m[1], mo: +m[2], d: +m[3] }) },
+      // 令和○年m月d日 / 平成○年m月d日 / 昭和○年m月d日
+      { re: /^(令和|平成|昭和|大正)(\d{1,2})年(\d{1,2})月(\d{1,2})日$/, parse: (m) => {
+        const era = WAREKI.find(w => w.name === m[1]);
+        return era ? { y: era.start + (+m[2]) - 1, mo: +m[3], d: +m[4] } : null;
+      }},
+      // R○.m.d / H○.m.d / S○.m.d
+      { re: /^([RHST])(\d{1,2})\.(\d{1,2})\.(\d{1,2})$/, parse: (m) => {
+        const era = WAREKI.find(w => w.short === m[1]);
+        return era ? { y: era.start + (+m[2]) - 1, mo: +m[3], d: +m[4] } : null;
+      }},
+    ];
+
+    // Excelシリアル値→日付判定（1900年基準）
+    function serialToDate(serial) {
+      if (typeof serial !== 'number' || serial < 1 || serial > 2958465) return null;
+      // Excel 1900-01-01 = 1, but Excel incorrectly treats 1900 as leap year
+      const epoch = new Date(1899, 11, 30);
+      const d = new Date(epoch.getTime() + serial * 86400000);
+      if (isNaN(d.getTime())) return null;
+      const y = d.getFullYear();
+      if (y < 1900 || y > 2100) return null;
+      return { y, mo: d.getMonth() + 1, d: d.getDate() };
+    }
+
+    // 日付の存在チェック（2月30日等を弾く）
+    function isValidDate(y, mo, d) {
+      if (y < 1900 || y > 2100 || mo < 1 || mo > 12 || d < 1 || d > 31) return false;
+      const dt = new Date(y, mo - 1, d);
+      return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
+    }
+
+    // 書式文字列が明示的な日付フォーマットかどうか判定
+    function isDateFormat(z) {
+      if (!z) return false;
+      const fmt = z.toLowerCase();
+      // 'General' や '#,##0' 等の汎用・数値書式は除外
+      if (fmt === 'general' || fmt.includes('#') || fmt.includes('0.')) return false;
+      // 日付に特有のパターンを含むか
+      return (fmt.includes('y') || fmt.includes('d') ||
+              fmt.includes('g') || fmt.includes('e') ||
+              fmt.includes('月') || fmt.includes('日') ||
+              /m{1,2}[\/\-]/.test(fmt) || /[\/\-]m{1,2}/.test(fmt));
+    }
+
+    // セルの値が日付かどうか判定
+    function parseDate(cell) {
+      if (!cell) return null;
+
+      // 日付型セル（SheetJSがtype='d'で認識したもの）
+      if (cell.t === 'd' && cell.v) {
+        const d = new Date(cell.v);
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          if (y >= 1900 && y <= 2100) {
+            return { y, mo: d.getMonth() + 1, d: d.getDate() };
+          }
+        }
+      }
+
+      // シリアル値 + 明示的な日付書式
+      if (cell.t === 'n' && isDateFormat(cell.z)) {
+        return serialToDate(cell.v);
+      }
+
+      // 数値型で日付書式がない、またはGeneralのセルは変換しない（金額・社員番号等の誤検出を防ぐ）
+      if (cell.t === 'n') return null;
+
+      // 文字列として日付パターンにマッチするか
+      if (cell.t === 's') {
+        const str = String(cell.w || cell.v).trim();
+        for (const p of DATE_PATTERNS) {
+          const m = str.match(p.re);
+          if (m) {
+            const parsed = p.parse(m);
+            if (parsed && isValidDate(parsed.y, parsed.mo, parsed.d)) {
+              return parsed;
+            }
+          }
+        }
+      }
+
+      return null;
+    }
+
+    // 日付→指定フォーマットの文字列
+    function formatDate(dateObj, fmt) {
+      const { y, mo, d } = dateObj;
+      const mm = String(mo).padStart(2, '0');
+      const dd = String(d).padStart(2, '0');
+
+      switch (fmt) {
+        case 'yyyy/MM/dd': return `${y}/${mm}/${dd}`;
+        case 'yyyy-MM-dd': return `${y}-${mm}-${dd}`;
+        case 'yyyy年M月d日': return `${y}年${mo}月${d}日`;
+        case 'wareki': {
+          for (const era of WAREKI) {
+            if (y >= era.start) {
+              const ey = y - era.start + 1;
+              return `${era.name}${ey}年${mo}月${d}日`;
+            }
+          }
+          return `${y}年${mo}月${d}日`;
+        }
+        case 'yyyyMMdd': return `${y}${mm}${dd}`;
+        case 'MM/dd': return `${mm}/${dd}`;
+        case 'M月d日': return `${mo}月${d}日`;
+        default: return `${y}/${mm}/${dd}`;
+      }
+    }
+
+    // 変換実行
+    convertBtn.addEventListener('click', () => {
+      const fmt = formatSelect.value;
+      convertedWorkbooks = [];
+      changeLog = [];
+      let totalSheets = 0;
+      let totalCells = 0;
+
+      for (const file of uploadedFiles) {
+        const wb = XLSX.read(file.arrayBuffer, { type: 'array', cellStyles: true, cellDates: true, cellNF: true });
+
+        for (const sheetName of wb.SheetNames) {
+          totalSheets++;
+          const ws = wb.Sheets[sheetName];
+          const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+
+          for (let r = range.s.r; r <= range.e.r; r++) {
+            for (let c = range.s.c; c <= range.e.c; c++) {
+              const addr = XLSX.utils.encode_cell({ r, c });
+              const cell = ws[addr];
+              if (!cell) continue;
+
+              const dateObj = parseDate(cell);
+              if (!dateObj) continue;
+
+              const before = cell.w || String(cell.v);
+              const after = formatDate(dateObj, fmt);
+
+              if (before !== after) {
+                changeLog.push({
+                  file: file.name,
+                  sheet: sheetName,
+                  cell: addr,
+                  before,
+                  after
+                });
+
+                // セルを文字列として書き換え
+                cell.t = 's';
+                cell.v = after;
+                cell.w = after;
+                delete cell.z;
+                totalCells++;
+              }
+            }
+          }
+        }
+
+        convertedWorkbooks.push({ name: file.name, workbook: wb });
+      }
+
+      // 結果表示
+      fileCountEl.textContent = uploadedFiles.length;
+      sheetCountEl.textContent = totalSheets;
+      cellCountEl.textContent = totalCells;
+
+      // 変更一覧（先頭20件）
+      changeTbody.innerHTML = changeLog.slice(0, 20).map(c => `
+        <tr>
+          <td>${escapeHtml(c.file)}</td>
+          <td>${escapeHtml(c.sheet)}</td>
+          <td>${c.cell}</td>
+          <td class="before">${escapeHtml(c.before)}</td>
+          <td class="after">${escapeHtml(c.after)}</td>
+        </tr>
+      `).join('');
+
+      if (changeLog.length > 20) {
+        changeTbody.innerHTML += `<tr><td colspan="5" style="text-align:center;color:var(--color-text-muted)">...他 ${changeLog.length - 20} 件</td></tr>`;
+      }
+
+      resultSection.classList.remove('hidden');
+      resetBtn.classList.remove('hidden');
+    });
+
+    // 変換後ファイルダウンロード
+    dlConverted.addEventListener('click', () => {
+      if (convertedWorkbooks.length === 1) {
+        const wb = convertedWorkbooks[0];
+        const out = XLSX.write(wb.workbook, { bookType: 'xlsx', type: 'array' });
+        downloadBlob(new Blob([out]), 'converted_' + wb.name);
+      } else {
+        // 複数ファイルの場合は個別ダウンロード
+        for (const wb of convertedWorkbooks) {
+          const out = XLSX.write(wb.workbook, { bookType: 'xlsx', type: 'array' });
+          downloadBlob(new Blob([out]), 'converted_' + wb.name);
+        }
+      }
+    });
+
+    // 元ファイルダウンロード
+    dlOriginal.addEventListener('click', () => {
+      for (const f of uploadedFiles) {
+        downloadBlob(f.originalBlob, f.name);
+      }
+    });
+
+    // リセット
+    resetBtn.addEventListener('click', () => {
+      uploadedFiles = [];
+      convertedWorkbooks = [];
+      changeLog = [];
+      fileListEl.innerHTML = '';
+      resultSection.classList.add('hidden');
+      resetBtn.classList.add('hidden');
+      convertBtn.disabled = true;
+      fileInput.value = '';
+    });
+
+    function downloadBlob(blob, name) {
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = name;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>
