@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excelの日付が「45015」になる？ — 日付トラブルの原因と対処法まとめ｜Sakuraku Tools</title>
+  <meta name="description" content="Excelで日付が5桁の数字になる原因を解説。シリアル値の仕組み、表示形式の直し方、ソートが壊れる理由、和暦・西暦の変換方法まで、日付トラブルをまとめて解決します。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/blog/excel-date-trouble/">
+  <meta property="og:title" content="Excelの日付が「45015」になる？ — 日付トラブルの原因と対処法まとめ">
+  <meta property="og:description" content="Excelで日付が5桁の数字になる原因を解説。シリアル値の仕組み、表示形式の直し方、ソートが壊れる理由、和暦・西暦の変換方法まで。">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://sakuraku-tools.com/blog/excel-date-trouble/">
+  <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/top.png">
+  <meta property="og:site_name" content="Sakuraku Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Excelの日付が「45015」になる？ — 日付トラブルの原因と対処法まとめ">
+  <meta name="twitter:description" content="Excelで日付が5桁の数字になる原因を解説。シリアル値の仕組みから和暦変換まで。">
+  <meta name="twitter:image" content="https://sakuraku-tools.com/img/ogp/top.png">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+  <style>
+    .article-body { max-width: 780px; margin: 0 auto; line-height: 1.9; }
+    .article-body h2 { margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--color-primary); }
+    .article-body h3 { margin-top: 32px; margin-bottom: 12px; }
+    .article-body p { margin-bottom: 18px; }
+    .article-body ul, .article-body ol { margin-bottom: 18px; padding-left: 1.5em; }
+    .article-body li { margin-bottom: 8px; }
+    .article-meta { color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 32px; }
+    .article-cta { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 24px; margin: 32px 0; text-align: center; }
+    .article-cta a { font-weight: bold; }
+    .ad-unit { margin: 32px 0; text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container article-body">
+      <p class="article-meta"><a href="/blog/">ブログ</a> &gt; 2026年4月14日</p>
+      <h1 class="tool-title">Excelの日付が「45015」になる？ — 日付トラブルの原因と対処法まとめ</h1>
+
+      <p>Excelで日付を入力したはずなのに、セルに「45015」のような5桁の数字が表示されて困ったことはありませんか？ あるいは、日付のソート（並べ替え）がうまくいかなかったり、和暦と西暦が混在してしまったり。この記事では、Excelの日付にまつわるトラブルの原因と対処法をまとめて解説します。</p>
+
+      <h2>そもそも「45015」って何？ — Excelの日付シリアル値</h2>
+
+      <p>Excelは内部的に、日付を「1900年1月1日を1とした連番」で管理しています。この連番を「シリアル値」と呼びます。たとえば「45015」は2023年3月15日を意味します。</p>
+
+      <p>つまり、Excelにとっての日付は「見た目が日付っぽい数字」ではなく、ただの整数です。普段は表示形式が「日付」になっているので「2023/3/15」のように見えますが、表示形式が「標準」や「数値」に切り替わると、中身のシリアル値がそのまま表示されてしまうのです。</p>
+
+      <p>この仕組みを知っておくと、日付のトラブルの大半が理解できるようになります。</p>
+
+      <h2>日付が数字になってしまう原因と直し方</h2>
+
+      <h3>原因1：表示形式が「標準」になっている</h3>
+
+      <p>もっとも多いのがこのケースです。コピー＆ペーストをしたときや、数式の結果を貼り付けたときに、セルの表示形式が「標準」に変わってしまうことがあります。</p>
+
+      <p><strong>直し方：</strong>セルを選択して右クリック → 「セルの書式設定」→ 「表示形式」タブ → 分類から「日付」を選択 → お好みの日付形式を選んで「OK」。これだけで正しい日付表示に戻ります。</p>
+
+      <h3>原因2：CSVファイルを開いたとき</h3>
+
+      <p>CSVファイルをExcelで開くと、日付が文字列として読み込まれることがあります。見た目は日付っぽくても、中身が文字列なので計算やソートに使えません。逆に、数字が入っているセルが日付として解釈されてしまうケースもあります。</p>
+
+      <p><strong>直し方：</strong>CSVを開くときは「データ」タブの「テキストまたはCSVから」を使って取り込みましょう。各列のデータ型を指定できるので、日付の列は「日付」、数字の列は「数値」と正しく設定できます。</p>
+
+      <h3>原因3：文字列として入力されている</h3>
+
+      <p>セルの先頭にアポストロフィ（'）が付いていたり、セルの表示形式が「文字列」になっている状態で日付を入力すると、見た目は日付でも中身はただの文字になります。</p>
+
+      <p><strong>直し方：</strong>表示形式を「日付」に変更してから、セルをダブルクリック → 何も変えずにEnterを押す。これでExcelが内容を再解釈して、正しいシリアル値に変換してくれます。</p>
+
+      <div class="ad-unit">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-9725852959499148"
+             data-ad-slot="auto"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+
+      <h2>日付のソートがうまくいかない原因</h2>
+
+      <p>日付を古い順や新しい順に並べ替えたいのに、おかしな順番になるのは、セルの中身が「日付」ではなく「文字列」になっているケースがほとんどです。</p>
+
+      <p>文字列のソートは「文字コード順」になるため、「2023/1/1」「2023/10/1」「2023/2/1」のような並びになってしまいます（「10」が「2」より前に来る）。</p>
+
+      <p><strong>確認方法：</strong>セルを選択して数式バーを確認してください。日付データなら左揃えではなく右揃えになっています。左揃えなら文字列になっている可能性が高いです。</p>
+
+      <p><strong>直し方：</strong>列全体を選択 → 表示形式を「日付」に変更 → データタブの「区切り位置」を使って変換する方法が確実です。区切り位置ウィザードで何も変えずに「完了」を押すだけで、文字列が日付に変換されます。</p>
+
+      <h2>和暦と西暦の変換方法</h2>
+
+      <p>書類によって「令和6年」と書くべきか「2024年」と書くべきか悩むことがあります。Excelなら表示形式を変えるだけで、同じデータを和暦にも西暦にも切り替えられます。</p>
+
+      <h3>西暦を和暦に変換する</h3>
+
+      <p>セルの書式設定で、表示形式のカテゴリから「日付」を選び、カレンダーの種類を「和暦」に変更するだけです。「平成」「令和」などの元号が自動的に付きます。</p>
+
+      <p>TEXT関数を使う方法もあります。<code>=TEXT(A1,"ggge""年""m""月""d""日""")</code> と入力すると、「令和6年4月14日」のように変換されます。</p>
+
+      <h3>和暦を西暦に変換する</h3>
+
+      <p>すでにシリアル値として入力されている日付なら、表示形式を「西暦の日付」に変えるだけでOKです。文字列として「R6.4.14」のように入力されている場合は、DATEVALUE関数を使って日付データに変換する必要があります。</p>
+
+      <h2>日付形式を統一するメリット</h2>
+
+      <p>チームでファイルを共有していると、人によって「2024/4/14」「2024-04-14」「4月14日」「R6.4.14」など、バラバラの形式で日付が入力されがちです。形式がバラバラだと、以下のような問題が起こります。</p>
+
+      <ul>
+        <li>ソートや検索が正しく動かない</li>
+        <li>VLOOKUP等の関数でマッチしない</li>
+        <li>ピボットテーブルでグループ化できない</li>
+        <li>印刷時の見た目がガタガタになる</li>
+      </ul>
+
+      <p>日付形式を最初に統一しておけば、これらのトラブルを一括で防げます。表示形式はExcelの設定で後からまとめて変更できますが、入力段階で「yyyy/m/d」に統一しておくのがベストです。</p>
+
+      <div class="article-cta">
+        <p>日付の形式をワンクリックで統一したいなら</p>
+        <p><a href="/tools/date-format/">Excel日付フォーマット統一ツール</a>を使ってみてください。</p>
+      </div>
+
+      <h2>まとめ</h2>
+
+      <p>Excelの日付トラブルの多くは、「表示形式」と「データの中身（シリアル値 or 文字列）」のズレが原因です。日付が数字になったら表示形式を確認する、ソートがおかしかったら文字列になっていないか確認する。この2つを押さえておけば、ほとんどの問題は解決できます。</p>
+
+      <p>和暦・西暦の変換も表示形式だけで対応できるので、元のデータを書き換える必要はありません。まずは「セルの書式設定」を開いてみることから始めてみてください。</p>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/blog/">ブログ</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+</body>
+</html>
