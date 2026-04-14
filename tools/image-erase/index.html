@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>画像の文字消し - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="画像の文字や個人情報を塗りつぶして消せる無料ツール。ドラッグで範囲選択して塗りつぶすだけ。登録不要・データはサーバーに送信しません。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/image-erase/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="画像の文字消し - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="画像の文字や個人情報を塗りつぶして消せます。データはサーバーに送りません。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/image-erase/">
+  <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/image-erase.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "モザイクと塗りつぶしの違いは何ですか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "モザイクは元の画像がうっすら残りますが、塗りつぶしは完全に隠します。メールアドレスや住所など確実に読めなくしたい情報には塗りつぶしがおすすめです。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "画像はサーバーに送信されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。すべてお使いのブラウザ内で処理されます。画像がインターネットに送信されることはありません。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "塗りつぶした部分を元に戻せますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "はい。「元に戻す」ボタンで1つ前の状態に戻せます。「全てリセット」で最初の状態に戻すこともできます。"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+    .upload-area p { color: var(--color-text-muted); margin-top: 8px; font-size: 0.9rem; }
+
+    .canvas-container {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      cursor: crosshair;
+      margin: 16px 0;
+    }
+    .canvas-container canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+    .selection-box {
+      position: absolute;
+      border: 2px solid var(--color-primary);
+      background: rgba(37, 99, 235, 0.15);
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .controls label { margin-bottom: 0; white-space: nowrap; }
+
+    .color-pick {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-pick input[type="color"] {
+      width: 36px;
+      height: 32px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .hidden { display: none !important; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol, .how-to ul { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">画像の文字消し</h1>
+      <p class="tool-description">画像の文字や個人情報をドラッグで選んで塗りつぶし。モザイクと違い、完全に隠せます。</p>
+
+      <div class="tool-panel">
+        <div id="upload-area" class="upload-area">
+          <strong>画像をドラッグ&ドロップ または クリックして選択</strong>
+          <p>JPEG / PNG / WebP 対応</p>
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none">
+        </div>
+
+        <div id="controls" class="hidden">
+          <div class="controls">
+            <label>塗りつぶしの色:</label>
+            <div class="color-pick">
+              <input type="color" id="fill-color" value="#ffffff">
+              <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.8rem;" onclick="document.getElementById('fill-color').value='#ffffff'">白</button>
+              <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.8rem;" onclick="document.getElementById('fill-color').value='#000000'">黒</button>
+              <button class="btn btn-secondary" style="padding:6px 10px;font-size:0.8rem;" id="eyedropper-btn">画像から色を取得</button>
+            </div>
+            <button id="undo-btn" class="btn btn-secondary">元に戻す</button>
+            <button id="reset-btn2" class="btn btn-secondary">全てリセット</button>
+          </div>
+
+          <div class="canvas-container" id="canvas-container">
+            <canvas id="canvas"></canvas>
+            <div class="selection-box hidden" id="selection-box"></div>
+          </div>
+
+          <div class="btn-group" style="margin-top:16px;">
+            <button id="dl-btn" class="btn btn-primary">画像をダウンロード</button>
+            <button id="new-btn" class="btn btn-secondary">別の画像を選択</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>画像の文字消しツールの使い方</h2>
+
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>画像をアップロードします（ドラッグ&ドロップまたはクリック）</li>
+          <li>塗りつぶしの色を選びます（白・黒・自由選択・画像から取得）</li>
+          <li>消したい部分をマウスでドラッグして範囲を選択します</li>
+          <li>選択した部分が塗りつぶされます</li>
+          <li>「画像をダウンロード」でPNG形式で保存します</li>
+        </ol>
+
+        <h3>こんな場面で使えます</h3>
+        <ul>
+          <li><strong>スクリーンショットの個人情報を消す</strong> — メールアドレス、名前、住所などを塗りつぶしてから共有</li>
+          <li><strong>書類のスキャン画像から特定の情報を消す</strong> — 見せたくない部分だけ白で塗りつぶし</li>
+          <li><strong>SNS投稿前に文字情報を消す</strong> — 写真に写り込んだ看板や表札を消す</li>
+          <li><strong>レビューや報告書に添付する画像の加工</strong> — 不要な文字を消してすっきりした画像に</li>
+          <li><strong>不動産写真の個人情報除去</strong> — 表札、郵便受けの名前を白で塗りつぶし</li>
+        </ul>
+
+        <h3>モザイクとの違い</h3>
+        <p>モザイクは元の画像がブロック状にぼやけた形で残るため、場合によっては内容を推測される可能性があります。特にメールアドレスや住所などの文字情報は、モザイクのブロックサイズが小さいと読み取られるリスクがあります。塗りつぶしは選択した範囲を単色で完全に覆うため、元の情報は一切残りません。確実に隠したい情報には塗りつぶしを使ってください。</p>
+
+        <h3>「画像から色を取得」機能</h3>
+        <p>「画像から色を取得」ボタンを押すと、画像の任意の場所をクリックしてその色を塗りつぶし色に設定できます。背景色に合わせて塗りつぶしたい場合に便利です。例えば書類の背景が薄いクリーム色の場合、その色を取得して塗りつぶせば、自然に文字を消すことができます。</p>
+
+        <h3>よくある質問</h3>
+        <p><strong>Q. 塗りつぶした部分を元に戻せますか？</strong><br>A. はい。「元に戻す」ボタンで1つ前の状態に戻せます。「全てリセット」で最初の状態に戻すこともできます。</p>
+        <p><strong>Q. モザイクと塗りつぶし、どちらを使うべきですか？</strong><br>A. 確実に読めなくしたい情報（住所・メールアドレス等）には塗りつぶし、雰囲気を残しつつ隠したい場合（顔など）にはモザイクがおすすめです。</p>
+        <p><strong>Q. 画像はサーバーに送信されますか？</strong><br>A. いいえ。すべてお使いのブラウザ内で処理されます。</p>
+
+        <h3>関連ツール</h3>
+        <ul>
+          <li><a href="/tools/image-mosaic/">画像モザイク加工</a> — 顔などをモザイクで隠したいときに</li>
+          <li><a href="/tools/image-compress/">画像圧縮</a> — 加工後の画像のファイルサイズを軽くしたいときに</li>
+          <li><a href="/tools/id-photo/">証明写真サイズ変更</a> — 証明写真を作りたいときに</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/blog/">ブログ</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script>
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const controls = document.getElementById('controls');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const canvasContainer = document.getElementById('canvas-container');
+    const selectionBox = document.getElementById('selection-box');
+    const fillColorInput = document.getElementById('fill-color');
+    const eyedropperBtn = document.getElementById('eyedropper-btn');
+    const undoBtn = document.getElementById('undo-btn');
+    const resetBtn2 = document.getElementById('reset-btn2');
+    const dlBtn = document.getElementById('dl-btn');
+    const newBtn = document.getElementById('new-btn');
+
+    let history = [];
+    let isSelecting = false;
+    let isEyedropping = false;
+    let startX = 0, startY = 0;
+
+    // Upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => loadImage(e.target.files[0]));
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault(); uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) loadImage(e.dataTransfer.files[0]);
+    });
+
+    function loadImage(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1200;
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = h * maxW / w; w = maxW; }
+          canvas.width = w;
+          canvas.height = h;
+          ctx.drawImage(img, 0, 0, w, h);
+          history = [ctx.getImageData(0, 0, w, h)];
+          uploadArea.classList.add('hidden');
+          controls.classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Canvas座標取得
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
+        rx: clientX - rect.left,
+        ry: clientY - rect.top
+      };
+    }
+
+    // スポイト（画像から色を取得）
+    eyedropperBtn.addEventListener('click', () => {
+      isEyedropping = true;
+      canvasContainer.style.cursor = 'crosshair';
+      eyedropperBtn.textContent = 'クリックで色を取得...';
+      eyedropperBtn.style.background = '#fef2f2';
+    });
+
+    // 選択・スポイト操作
+    function onStart(e) {
+      e.preventDefault();
+      const pos = getCanvasPos(e);
+
+      if (isEyedropping) {
+        // スポイトモード：クリックした位置の色を取得
+        const pixel = ctx.getImageData(Math.floor(pos.x), Math.floor(pos.y), 1, 1).data;
+        const hex = '#' + [pixel[0], pixel[1], pixel[2]].map(v => v.toString(16).padStart(2, '0')).join('');
+        fillColorInput.value = hex;
+        isEyedropping = false;
+        canvasContainer.style.cursor = 'crosshair';
+        eyedropperBtn.textContent = '画像から色を取得';
+        eyedropperBtn.style.background = '';
+        return;
+      }
+
+      isSelecting = true;
+      startX = pos.x;
+      startY = pos.y;
+      selectionBox.style.left = pos.rx + 'px';
+      selectionBox.style.top = pos.ry + 'px';
+      selectionBox.style.width = '0';
+      selectionBox.style.height = '0';
+      selectionBox.classList.remove('hidden');
+    }
+
+    function onMove(e) {
+      if (!isSelecting) return;
+      e.preventDefault();
+      const pos = getCanvasPos(e);
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const rx = Math.min(pos.rx, startX / scaleX);
+      const ry = Math.min(pos.ry, startY / scaleY);
+      const rw = Math.abs(pos.rx - startX / scaleX);
+      const rh = Math.abs(pos.ry - startY / scaleY);
+      selectionBox.style.left = rx + 'px';
+      selectionBox.style.top = ry + 'px';
+      selectionBox.style.width = rw + 'px';
+      selectionBox.style.height = rh + 'px';
+    }
+
+    function onEnd(e) {
+      if (!isSelecting) return;
+      isSelecting = false;
+      selectionBox.classList.add('hidden');
+      const pos = getCanvasPos(e.changedTouches ? e.changedTouches[0] : e);
+      const x = Math.min(startX, pos.x);
+      const y = Math.min(startY, pos.y);
+      const w = Math.abs(pos.x - startX);
+      const h = Math.abs(pos.y - startY);
+      if (w < 3 || h < 3) return;
+      fillRect(x, y, w, h);
+    }
+
+    canvasContainer.addEventListener('mousedown', onStart);
+    canvasContainer.addEventListener('mousemove', onMove);
+    canvasContainer.addEventListener('mouseup', onEnd);
+    canvasContainer.addEventListener('touchstart', onStart, { passive: false });
+    canvasContainer.addEventListener('touchmove', onMove, { passive: false });
+    canvasContainer.addEventListener('touchend', onEnd);
+
+    function fillRect(x, y, w, h) {
+      ctx.fillStyle = fillColorInput.value;
+      ctx.fillRect(Math.floor(x), Math.floor(y), Math.ceil(w), Math.ceil(h));
+      history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    }
+
+    // 元に戻す
+    undoBtn.addEventListener('click', () => {
+      if (history.length > 1) {
+        history.pop();
+        ctx.putImageData(history[history.length - 1], 0, 0);
+      }
+    });
+
+    // 全てリセット
+    resetBtn2.addEventListener('click', () => {
+      if (history.length > 0) {
+        ctx.putImageData(history[0], 0, 0);
+        history = [history[0]];
+      }
+    });
+
+    // ダウンロード
+    dlBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'erased.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // 別の画像
+    newBtn.addEventListener('click', () => {
+      controls.classList.add('hidden');
+      uploadArea.classList.remove('hidden');
+      fileInput.value = '';
+      history = [];
+    });
+  </script>
+</body>
+</html>

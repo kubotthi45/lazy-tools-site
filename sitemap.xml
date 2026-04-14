@@ -66,6 +66,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://sakuraku-tools.com/tools/image-erase/</loc>
+    <lastmod>2026-04-14</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://sakuraku-tools.com/about.html</loc>
     <lastmod>2026-04-04</lastmod>
     <priority>0.3</priority>
