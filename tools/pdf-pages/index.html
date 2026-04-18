@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDFページ並び替え・削除 - 無料・登録不要｜Sakuraku Tools</title>
+  <meta name="description" content="PDFのページをドラッグで並び替え・削除できる無料ツール。登録不要・PDFはネットに送られないので安心。複数ファイル結合にも対応。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://sakuraku-tools.com/tools/pdf-pages/">
+  <link rel="stylesheet" href="/css/common.css">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
+     crossorigin="anonymous"></script>
+
+  <meta property="og:title" content="PDFページ並び替え・削除 - 無料・登録不要｜Sakuraku Tools">
+  <meta property="og:description" content="PDFのページをドラッグで並び替え・削除。PDFはネットに送られないので安心です。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sakuraku-tools.com/tools/pdf-pages/">
+  <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/pdf-pages.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "PDFはサーバーに送信されますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "いいえ。すべてお使いのブラウザ内で処理されます。PDFがインターネットに送信されることはありません。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "複数のPDFを結合できますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "はい。複数のPDFファイルを一度にアップロードすると、すべてのページが順番に並びます。並び順を変えたり不要なページを削除したりして、1つのPDFとしてダウンロードできます。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ページ数の多いPDFでも使えますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "はい使えますが、ページ数が多いほどサムネイル生成に時間がかかります。100ページを超える場合は読み込みに10秒以上かかることがあります。お使いの端末性能にもよります。"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    .upload-area {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+    .upload-area p { color: var(--color-text-muted); margin-top: 8px; font-size: 0.9rem; }
+
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .page-thumb {
+      position: relative;
+      border: 2px solid var(--color-border);
+      border-radius: 6px;
+      background: #fff;
+      padding: 8px;
+      cursor: grab;
+      user-select: none;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+    .page-thumb:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+    }
+    .page-thumb.dragging {
+      opacity: 0.4;
+    }
+    .page-thumb.drag-over {
+      border-color: var(--color-primary);
+      transform: scale(1.03);
+    }
+    .page-thumb canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #f5f5f5;
+    }
+    .page-thumb .page-num {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .page-thumb .page-source {
+      position: absolute;
+      top: 4px;
+      right: 32px;
+      background: rgba(37, 99, 235, 0.85);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      max-width: 80px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .page-thumb .page-delete {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .page-thumb .page-delete:hover {
+      background: #dc2626;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+    .controls .info {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-left: auto;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--color-primary);
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    .hidden { display: none !important; }
+
+    .how-to { margin-top: 40px; }
+    .how-to h2 { font-size: 1.2rem; margin-bottom: 16px; }
+    .how-to h3 { font-size: 1rem; margin: 20px 0 8px; }
+    .how-to p, .how-to li { color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.8; }
+    .how-to ol, .how-to ul { padding-left: 1.5em; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="logo">Sakuraku Tools</a>
+      <p class="tagline">サクッと楽に、ずっと無料。</p>
+    </div>
+  </header>
+
+  <main class="tool-main">
+    <div class="container">
+      <h1 class="tool-title">PDFページ並び替え・削除</h1>
+      <p class="tool-description">PDFのページをドラッグで並び替えたり、いらないページを消したり。複数のPDFをまとめて1つにすることもできます。</p>
+
+      <div class="tool-panel">
+        <div id="upload-area" class="upload-area">
+          <strong>PDFをドラッグ&ドロップ または クリックして選択</strong>
+          <p>複数ファイル選択可能。すべてのページが順番に並びます。</p>
+          <input type="file" id="file-input" accept="application/pdf" multiple style="display:none">
+        </div>
+
+        <div class="progress hidden" id="progress">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div id="editor" class="hidden">
+          <div class="controls">
+            <button class="btn btn-secondary" id="add-more-btn">ファイル追加</button>
+            <button class="btn btn-secondary" id="reset-btn">最初からやり直す</button>
+            <span class="info"><span id="page-count">0</span>ページ</span>
+          </div>
+
+          <div class="pages-grid" id="pages-grid"></div>
+
+          <div class="btn-group" style="margin-top:16px;">
+            <button id="dl-btn" class="btn btn-primary">PDFをダウンロード</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ad-slot">広告スペース（AdSense審査通過後に設置）</div>
+
+      <section class="how-to">
+        <h2>PDFページ並び替え・削除ツールの使い方</h2>
+
+        <h3>基本的な使い方</h3>
+        <ol>
+          <li>PDFファイルをアップロードします（複数ファイル可）</li>
+          <li>各ページのサムネイルがグリッド表示されます</li>
+          <li>ドラッグ&ドロップでページの順番を入れ替えます</li>
+          <li>右上の「×」ボタンでいらないページを削除します</li>
+          <li>「PDFをダウンロード」で並び替え後のPDFを保存します</li>
+        </ol>
+
+        <h3>こんな場面で使えます</h3>
+        <ul>
+          <li><strong>スキャンしたPDFのページ順序を直す</strong> — スキャナーで逆順に取り込んだPDFを正しい順序に並び替え</li>
+          <li><strong>請求書から特定ページだけ抜き出す</strong> — いらないページを削除して必要なページだけ残す</li>
+          <li><strong>複数のPDFを1つにまとめる</strong> — 領収書PDFを月ごとに1ファイルに統合</li>
+          <li><strong>会議資料の差し替え</strong> — 古いページを削除して新しいページを追加</li>
+          <li><strong>提出書類の順序調整</strong> — 表紙→本文→添付の順に並び替えてから提出</li>
+          <li><strong>白紙ページや表紙を削除</strong> — スキャン時の白紙ページや不要な表紙を取り除く</li>
+        </ul>
+
+        <h3>複数PDF結合のやり方</h3>
+        <p>PDF結合がしたい場合は、最初に複数のPDFファイルを一度に選択するか、「ファイル追加」ボタンであとから追加してください。すべてのファイルのページが順番に並ぶので、ドラッグで好きな順序に変えてダウンロードすれば1つのPDFになります。各ページのラベルに元ファイル名が表示されるので、どのページがどのPDF由来か一目でわかります。</p>
+
+        <h3>ブラウザだけで完結する仕組み</h3>
+        <p>このツールはJavaScriptライブラリ（pdf.js と pdf-lib）を使い、すべての処理をお使いのブラウザの中だけで行います。アップロードボタンを押してもPDFがどこかのサーバーに送られることはなく、お使いの端末から外には出ません。社外秘の資料や個人情報を含むPDFでも安心して使えます。インターネット接続が切れていても一度ページを開いてしまえば動作します。</p>
+
+        <h3>ファイル名について</h3>
+        <p>ダウンロードされるPDFのファイル名には、最初にアップロードした元ファイル名が含まれます（例：元ファイル名が「契約書.pdf」なら「契約書_編集後.pdf」）。複数ファイルをまとめた場合は最初のファイル名が使われます。後から見返したときに「これは何のPDFだっけ？」とならないよう、元の名前を引き継ぐ仕様にしています。</p>
+
+        <h3>よくある質問</h3>
+        <p><strong>Q. 何ページまで扱えますか？</strong><br>A. 上限はありませんが、100ページを超えるとサムネイル生成に時間がかかります（端末性能による）。重い場合は分割して処理してください。</p>
+        <p><strong>Q. PDFはサーバーに送信されますか？</strong><br>A. いいえ。すべてブラウザ内で処理されます。ネット接続を切っても動作します。</p>
+        <p><strong>Q. 暗号化されたPDFも扱えますか？</strong><br>A. 申し訳ありません、パスワード保護されたPDFは現在対応していません。先にパスワードを解除してから使ってください。</p>
+        <p><strong>Q. 元のPDFの画質は維持されますか？</strong><br>A. はい。サムネイル表示用に縮小はしますが、ダウンロードされるPDFは元のページデータをそのままコピーするため画質は劣化しません。</p>
+
+        <h3>関連ツール</h3>
+        <ul>
+          <li><a href="/tools/image-compress/">画像圧縮</a> — PDFに貼る画像を軽くしたいときに</li>
+          <li><a href="/tools/qr-generator/">QRコード生成</a> — PDFにQRコードを貼りたいときに</li>
+          <li><a href="/tools/image-erase/">画像の文字消し</a> — PDF内の画像から文字を消したいときに</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <nav class="footer-nav">
+        <a href="/">ホーム</a>
+        <a href="/blog/">ブログ</a>
+        <a href="/privacy.html">プライバシーポリシー</a>
+        <a href="/about.html">このサイトについて</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Sakuraku Tools</p>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const editor = document.getElementById('editor');
+    const pagesGrid = document.getElementById('pages-grid');
+    const progress = document.getElementById('progress');
+    const progressBar = document.getElementById('progress-bar');
+    const pageCountEl = document.getElementById('page-count');
+    const addMoreBtn = document.getElementById('add-more-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const dlBtn = document.getElementById('dl-btn');
+
+    // 状態: ページの配列。各要素 = { id, sourceIdx, pageIdx, fileName }
+    let pages = [];
+    // 元PDFのArrayBuffer配列
+    let sources = [];
+    // 元ファイル名
+    let firstFileName = '';
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+    addMoreBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+    uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+    });
+
+    async function handleFiles(fileList) {
+      const files = Array.from(fileList).filter(f => f.type === 'application/pdf');
+      if (files.length === 0) return;
+
+      progress.classList.remove('hidden');
+      progressBar.style.width = '0%';
+
+      let totalPages = 0;
+      let processedPages = 0;
+
+      // まず合計ページ数を概算するため、各PDFをロード
+      const loadedPdfs = [];
+      for (const file of files) {
+        const buf = await file.arrayBuffer();
+        const sourceIdx = sources.length;
+        sources.push(buf);
+        if (!firstFileName) firstFileName = file.name.replace(/\.pdf$/i, '');
+
+        const pdf = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
+        loadedPdfs.push({ pdf, file, sourceIdx });
+        totalPages += pdf.numPages;
+      }
+
+      // サムネイル生成
+      for (const { pdf, file, sourceIdx } of loadedPdfs) {
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 0.3 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+          const id = `p_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+          pages.push({
+            id,
+            sourceIdx,
+            pageIdx: i - 1,
+            fileName: file.name,
+            canvas
+          });
+
+          processedPages++;
+          progressBar.style.width = `${(processedPages / totalPages) * 100}%`;
+        }
+      }
+
+      progress.classList.add('hidden');
+      uploadArea.classList.add('hidden');
+      editor.classList.remove('hidden');
+      fileInput.value = '';
+      render();
+    }
+
+    function render() {
+      pagesGrid.innerHTML = '';
+      pageCountEl.textContent = pages.length;
+
+      pages.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.className = 'page-thumb';
+        div.draggable = true;
+        div.dataset.id = p.id;
+
+        const numLabel = document.createElement('div');
+        numLabel.className = 'page-num';
+        numLabel.textContent = idx + 1;
+        div.appendChild(numLabel);
+
+        const sourceLabel = document.createElement('div');
+        sourceLabel.className = 'page-source';
+        sourceLabel.textContent = p.fileName;
+        sourceLabel.title = `${p.fileName} (元P.${p.pageIdx + 1})`;
+        div.appendChild(sourceLabel);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'page-delete';
+        delBtn.textContent = '×';
+        delBtn.title = 'このページを削除';
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          pages = pages.filter(pp => pp.id !== p.id);
+          render();
+        });
+        div.appendChild(delBtn);
+
+        // canvasはクローン（DOM上で1回しか使えないため）
+        const cloneCanvas = document.createElement('canvas');
+        cloneCanvas.width = p.canvas.width;
+        cloneCanvas.height = p.canvas.height;
+        cloneCanvas.getContext('2d').drawImage(p.canvas, 0, 0);
+        div.appendChild(cloneCanvas);
+
+        // ドラッグイベント
+        div.addEventListener('dragstart', (e) => {
+          div.classList.add('dragging');
+          e.dataTransfer.setData('text/plain', p.id);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        div.addEventListener('dragend', () => div.classList.remove('dragging'));
+        div.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          div.classList.add('drag-over');
+        });
+        div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+        div.addEventListener('drop', (e) => {
+          e.preventDefault();
+          div.classList.remove('drag-over');
+          const fromId = e.dataTransfer.getData('text/plain');
+          if (fromId === p.id) return;
+          const fromIdx = pages.findIndex(pp => pp.id === fromId);
+          const toIdx = pages.findIndex(pp => pp.id === p.id);
+          if (fromIdx < 0 || toIdx < 0) return;
+          const [moved] = pages.splice(fromIdx, 1);
+          pages.splice(toIdx, 0, moved);
+          render();
+        });
+
+        pagesGrid.appendChild(div);
+      });
+    }
+
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('編集内容をすべて破棄して最初に戻りますか？')) return;
+      pages = [];
+      sources = [];
+      firstFileName = '';
+      pagesGrid.innerHTML = '';
+      editor.classList.add('hidden');
+      uploadArea.classList.remove('hidden');
+    });
+
+    dlBtn.addEventListener('click', async () => {
+      if (pages.length === 0) {
+        alert('ページが1枚もありません。');
+        return;
+      }
+      dlBtn.disabled = true;
+      dlBtn.textContent = '生成中...';
+
+      try {
+        const { PDFDocument } = PDFLib;
+        const outDoc = await PDFDocument.create();
+
+        // 元PDFをロード（一度だけ）
+        const sourceDocs = await Promise.all(
+          sources.map(buf => PDFDocument.load(buf.slice(0)))
+        );
+
+        for (const p of pages) {
+          const [copied] = await outDoc.copyPages(sourceDocs[p.sourceIdx], [p.pageIdx]);
+          outDoc.addPage(copied);
+        }
+
+        const bytes = await outDoc.save();
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const safeName = (firstFileName || 'pdf').replace(/[\\\/:*?"<>|]/g, '_');
+        link.download = `${safeName}_編集後.pdf`;
+        link.href = url;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (err) {
+        console.error(err);
+        alert('PDFの生成に失敗しました。ファイルが暗号化されていないか確認してください。');
+      } finally {
+        dlBtn.disabled = false;
+        dlBtn.textContent = 'PDFをダウンロード';
+      }
+    });
+  </script>
+</body>
+</html>
