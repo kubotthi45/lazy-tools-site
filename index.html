@@ -13,85 +13,232 @@
   <meta property="og:image" content="https://sakuraku-tools.com/img/ogp/top.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://sakuraku-tools.com/">
-  <link rel="stylesheet" href="/css/common.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;800;900&family=Playfair+Display:ital,wght@1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/common.css?v=6">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9725852959499148"
      crossorigin="anonymous"></script>
+
+  <!-- 桜SVGをdefsで定義して使い回す -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="sakura" viewBox="0 0 24 24">
+      <g fill="currentColor">
+        <ellipse cx="12" cy="5.5" rx="2.4" ry="3.4" transform="rotate(0 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="2.4" ry="3.4" transform="rotate(72 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="2.4" ry="3.4" transform="rotate(144 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="2.4" ry="3.4" transform="rotate(216 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="2.4" ry="3.4" transform="rotate(288 12 12)"/>
+        <circle cx="12" cy="12" r="1.6" fill="#fff7fb"/>
+      </g>
+    </symbol>
+  </svg>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="/" class="logo">Sakuraku Tools</a>
+      <a href="/" class="logo">
+        <span class="logo-mark" aria-hidden="true"><svg><use href="#sakura"/></svg></span>
+        Sakuraku Tools
+      </a>
       <p class="tagline">サクッと楽に、ずっと無料。</p>
     </div>
   </header>
 
   <main class="container">
+    <!-- ===== Hero ===== -->
     <section class="hero">
-      <h1>ブラウザだけで完結する無料ツール</h1>
-      <p>登録不要。ファイルはサーバーに送信されません。</p>
+      <div class="hero-text">
+        <p class="hero-eyebrow">10 Free Tools / Browser Only</p>
+        <h1>面倒な作業、<br><span class="lined accent">サクッと</span>終わらせる。</h1>
+        <p class="lead">画像加工・PDF整理・Excel整形・QR生成。日常のちょっと面倒な作業を、ブラウザだけで一瞬で終わらせる無料ツール集です。</p>
+        <div class="hero-meta">
+          <div class="hero-meta-item"><strong>10</strong>Tools</div>
+          <div class="hero-meta-item"><strong>0円</strong>Forever Free</div>
+          <div class="hero-meta-item"><strong>0秒</strong>No Signup</div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="petal p1"><svg><use href="#sakura"/></svg></div>
+        <div class="petal p2"><svg><use href="#sakura"/></svg></div>
+        <div class="petal p3"><svg><use href="#sakura"/></svg></div>
+
+        <div class="hero-card hc1">
+          <span class="hc-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="6" height="6"/><rect x="11" y="3" width="6" height="6" opacity="0.6"/><rect x="3" y="11" width="6" height="6" opacity="0.6"/><rect x="11" y="11" width="6" height="6"/></svg>
+          </span>
+          <span class="hc-label">画像モザイク</span>
+          <span class="hc-meta">IMAGE</span>
+        </div>
+
+        <div class="hero-card hc2">
+          <span class="hc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="9" height="12" rx="1"/><rect x="11" y="9" width="9" height="12" rx="1"/></svg>
+          </span>
+          <span class="hc-label">PDF並び替え</span>
+          <span class="hc-meta">FILE</span>
+        </div>
+
+        <div class="hero-card hc3">
+          <span class="hc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </span>
+          <span class="hc-label">QRコード</span>
+          <span class="hc-meta">CODE</span>
+        </div>
+
+        <div class="hero-card hc4">
+          <span class="hc-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          </span>
+          <span class="hc-label">証明写真</span>
+          <span class="hc-meta">IMAGE</span>
+        </div>
+      </div>
     </section>
 
-    <section class="tools-grid">
-      <a href="/tools/qr-generator/" class="tool-card">
-        <div class="tool-icon">&#9641;</div>
-        <h2>QRコード生成</h2>
-        <p>テキストやURLからQRコードをサクッと作成。画像で保存できます。</p>
-      </a>
+    <!-- ===== 01: 画像系 ===== -->
+    <section class="cat-section image">
+      <div class="cat-header">
+        <div class="cat-header-left">
+          <span class="cat-num">01</span>
+          <div>
+            <h2 class="cat-title">画像加工</h2>
+            <p class="cat-subtitle">写真・スクショの編集をブラウザで</p>
+          </div>
+        </div>
+        <span class="cat-count">5 TOOLS</span>
+      </div>
+      <div class="tools-grid">
+        <a href="/tools/image-erase/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16c-1-1-1-3 0-4l11-11c1-1 3-1 4 0l5 5c1 1 1 3 0 4L11 20"/><line x1="6" y1="11" x2="13" y2="18"/></svg>
+          </span>
+          <h2>画像の文字消し</h2>
+          <p>画像の文字や個人情報をドラッグで選んで塗りつぶし。モザイクと違って完全に消せます。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
 
-      <a href="/tools/image-mosaic/" class="tool-card">
-        <div class="tool-icon">&#9638;</div>
-        <h2>画像モザイク加工</h2>
-        <p>写真の一部にモザイクをかけられます。顔や個人情報の保護に。</p>
-      </a>
+        <a href="/tools/image-mosaic/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="6" height="6"/><rect x="11" y="3" width="6" height="6" opacity="0.6"/><rect x="3" y="11" width="6" height="6" opacity="0.6"/><rect x="11" y="11" width="6" height="6"/><rect x="3" y="19" width="6" height="2" opacity="0.4"/><rect x="11" y="19" width="6" height="2" opacity="0.4"/><rect x="19" y="3" width="2" height="6" opacity="0.4"/><rect x="19" y="11" width="2" height="6" opacity="0.4"/></svg>
+          </span>
+          <h2>画像モザイク加工</h2>
+          <p>顔や個人情報をモザイクで隠せます。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
 
-      <a href="/tools/id-photo/" class="tool-card">
-        <div class="tool-icon">&#128100;</div>
-        <h2>証明写真サイズ変更</h2>
-        <p>スマホ写真を履歴書・パスポート・免許証サイズに。高画質で保存。</p>
-      </a>
+        <a href="/tools/image-compress/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </span>
+          <h2>画像圧縮</h2>
+          <p>「○KB以下」の指定もできます。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
 
-      <a href="/tools/image-compress/" class="tool-card">
-        <div class="tool-icon">&#128230;</div>
-        <h2>画像圧縮</h2>
-        <p>画像のファイルサイズを軽くします。「○KB以下」の指定もできます。</p>
-      </a>
+        <a href="/tools/id-photo/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          </span>
+          <h2>証明写真サイズ変更</h2>
+          <p>履歴書・パスポート・免許証に対応。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
 
-      <a href="/tools/zen-han/" class="tool-card">
-        <div class="tool-icon">&#8644;</div>
-        <h2>全角半角変換</h2>
-        <p>テキストの全角⇔半角をサクッと変換。英数字・カタカナ・記号に対応。</p>
-      </a>
-
-      <a href="/tools/password-gen/" class="tool-card">
-        <div class="tool-icon">&#128274;</div>
-        <h2>パスワード生成</h2>
-        <p>安全なパスワードをサクッと作成。文字数や記号の有無を選べます。</p>
-      </a>
-
-      <a href="/tools/stamp-maker/" class="tool-card">
-        <div class="tool-icon">&#12958;</div>
-        <h2>電子印鑑作成</h2>
-        <p>名前を入力するだけで印鑑画像を作成。WordやExcelにそのまま貼れます。</p>
-      </a>
-
-      <a href="/tools/date-format/" class="tool-card">
-        <div class="tool-icon">&#128197;</div>
-        <h2>Excel日付フォーマット統一</h2>
-        <p>Excelファイルのバラバラな日付書式を一括変換。複数ブック対応。</p>
-      </a>
-
-      <a href="/tools/image-erase/" class="tool-card">
-        <div class="tool-icon">&#9724;</div>
-        <h2>画像の文字消し</h2>
-        <p>画像の文字や個人情報を塗りつぶして完全に消せます。モザイクより確実。</p>
-      </a>
-
-      <a href="/tools/pdf-pages/" class="tool-card">
-        <div class="tool-icon">&#128196;</div>
-        <h2>PDFページ並び替え・削除</h2>
-        <p>PDFのページをドラッグで並び替え、いらないページを削除。複数PDF結合もOK。</p>
-      </a>
+        <a href="/tools/stamp-maker/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M3 21h18"/><path d="M6 18h12"/></svg>
+          </span>
+          <h2>電子印鑑作成</h2>
+          <p>名前を入れるだけ。WordやExcelに貼れます。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
+      </div>
     </section>
+
+    <!-- ===== 02: ファイル系 ===== -->
+    <section class="cat-section file">
+      <div class="cat-header">
+        <div class="cat-header-left">
+          <span class="cat-num">02</span>
+          <div>
+            <h2 class="cat-title">Excel・PDF</h2>
+            <p class="cat-subtitle">事務作業がちょっと楽になる</p>
+          </div>
+        </div>
+        <span class="cat-count">2 TOOLS</span>
+      </div>
+      <div class="tools-grid">
+        <a href="/tools/pdf-pages/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="9" height="12" rx="1"/><rect x="11" y="9" width="9" height="12" rx="1"/></svg>
+          </span>
+          <h2>PDFページ並び替え・削除</h2>
+          <p>ドラッグでページの順番を入れ替え、いらないページを削除。複数PDFを1つに結合もOK。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
+
+        <a href="/tools/date-format/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 15h2"/><path d="M14 15h2"/></svg>
+          </span>
+          <h2>Excel日付フォーマット統一</h2>
+          <p>バラバラな日付書式を一括変換。複数ブック対応。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== 03: テキスト・コード系 ===== -->
+    <section class="cat-section text">
+      <div class="cat-header">
+        <div class="cat-header-left">
+          <span class="cat-num">03</span>
+          <div>
+            <h2 class="cat-title">テキスト・コード</h2>
+            <p class="cat-subtitle">文字列・QR・パスワードのちょっとした処理</p>
+          </div>
+        </div>
+        <span class="cat-count">3 TOOLS</span>
+      </div>
+      <div class="tools-grid">
+        <a href="/tools/qr-generator/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="17"/><line x1="17" y1="14" x2="20" y2="14"/><line x1="14" y1="20" x2="17" y2="20"/><line x1="20" y1="17" x2="20" y2="20"/></svg>
+          </span>
+          <h2>QRコード生成</h2>
+          <p>テキストやURLからQRコードを作成。画像で保存できます。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
+
+        <a href="/tools/zen-han/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h13l-3-3"/><path d="M21 16H8l3 3"/></svg>
+          </span>
+          <h2>全角半角変換</h2>
+          <p>テキストの全角⇔半角をサクッと変換。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
+
+        <a href="/tools/password-gen/" class="tool-card">
+          <span class="tool-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <h2>パスワード生成</h2>
+          <p>安全なパスワードをサクッと作成。</p>
+          <span class="tool-cta">使う →</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== Trust strip ===== -->
+    <div class="trust-strip">
+      <span class="trust-pill"><strong>登録</strong>不要</span>
+      <span class="trust-pill"><strong>ファイル</strong>はネットに送られません</span>
+      <span class="trust-pill"><strong>広告</strong>あり / 課金なし</span>
+      <span class="trust-pill"><strong>スマホ</strong>もPCもOK</span>
+    </div>
   </main>
 
   <footer class="site-footer">
